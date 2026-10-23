@@ -192,6 +192,44 @@ final class SettingsServiceTest extends TestCase
         $this->assertTrue(str_contains($joined, 'cover') || str_contains($joined, 'обложка'));
     }
 
+    /** Единый контракт ответа ['ok'=>bool,'errors'=>list<string>] для всех методов (шаг 2). */
+    public function testNotFoundContractUniform(): void
+    {
+        $missing = 'game-not-exists';
+        foreach ([
+            fn () => $this->svc->saveControls($missing, ['left' => 'KeyA']),
+            fn () => $this->svc->resetControls($missing),
+            fn () => $this->svc->saveSounds($missing, ['sounds' => []]),
+            fn () => $this->svc->resetSounds($missing),
+            fn () => $this->svc->saveOverrides($missing, ['speed_scale' => 1]),
+            fn () => $this->svc->resetOverridesToGenre($missing),
+            fn () => $this->svc->copyFrom($missing, 'x', ['controls']),
+        ] as $call) {
+            $res = $call();
+            $this->assertFalse($res['ok']);
+            $this->assertSame(['Игра не найдена.'], $res['errors']);
+        }
+    }
+
+    public function testResetSoundsToGenreDefaults(): void
+    {
+        $game = $this->makeGame('snd-reset');
+        $genre = $this->genres->find((string)$game['genre_id']);
+        $defaults = array_values((array)($genre['engine_config']['default_sounds'] ?? []));
+        // сохраняем один свой звук
+        $custom = [['event' => 'pickup', 'wave' => 'square', 'frequency_hz' => 440,
+            'duration_ms' => 80, 'volume' => 0.2, 'envelope' => 'decay']];
+        $res = $this->svc->saveSounds($game['id'], ['sounds' => $custom]);
+        $this->assertTrue($res['ok']);
+        $fresh = $this->games->find($game['id']);
+        $this->assertCount(1, (array)$fresh['sounds']);
+        // сброс -> дефолты жанра
+        $this->assertTrue($this->svc->resetSounds($game['id'])['ok']);
+        $fresh = $this->games->find($game['id']);
+        $this->assertSame($defaults, array_values((array)$fresh['sounds']));
+        $this->assertContains('"action":"game.settings_reset"', $this->auditLines());
+    }
+
     private function auditLines(): string
     {
         return (string)@file_get_contents($this->dir . '/audit.log');

@@ -81,7 +81,7 @@ final class SettingsService
     {
         $ctx = $this->context($gameId);
         if ($ctx === null) {
-            return ['Игра не найдена.'];
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
         }
         $engine = (string)($ctx['genre']['engine'] ?? '');
         $legend = $this->games->effectiveLegend($ctx['game']);
@@ -137,7 +137,7 @@ final class SettingsService
     {
         $ctx = $this->context($gameId);
         if ($ctx === null) {
-            return ['Игра не найдена.'];
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
         }
         $defaults = (array)($ctx['genre']['engine_config']['default_controls'] ?? []);
         $this->mutate($gameId, static function (array &$game) use ($defaults): void {
@@ -157,7 +157,7 @@ final class SettingsService
     {
         $ctx = $this->context($gameId);
         if ($ctx === null) {
-            return ['Игра не найдена.'];
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
         }
         if (isset($input['sounds_json']) && is_string($input['sounds_json'])) {
             $decoded = json_decode($input['sounds_json'], true);
@@ -208,7 +208,7 @@ final class SettingsService
     {
         $ctx = $this->context($gameId);
         if ($ctx === null) {
-            return ['Игра не найдена.'];
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
         }
         $defaults = array_values((array)($ctx['genre']['engine_config']['default_sounds'] ?? []));
         $this->mutate($gameId, static function (array &$game) use ($defaults): void {
@@ -228,7 +228,7 @@ final class SettingsService
     {
         $ctx = $this->context($gameId);
         if ($ctx === null) {
-            return ['Игра не найдена.'];
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
         }
         $engine = (string)($ctx['genre']['engine'] ?? '');
         $source = isset($input['engine_overrides']) && is_array($input['engine_overrides'])
