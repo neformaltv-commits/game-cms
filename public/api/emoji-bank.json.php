@@ -14,7 +14,7 @@ use App\Http\ClientIp;
 use App\Http\Response;
 
 $limit = $app['limiter']->check(
-    \App\RateLimit\Limiter::keyFor('api/emoji-bank.json', ClientIp::get($app['config'])),
+    \App\RateLimit\Limiter::keyFor('api/emoji-bank.json', ClientIp::from($_SERVER, $app['config']['trusted_proxies'] ?? [])),
     120,
     60,
 );
