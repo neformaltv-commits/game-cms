@@ -40,7 +40,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     } elseif ($action === 'save') {
         $data = [
             'id'          => (string)($_POST['id'] ?? ''),
-            'slug'        => \App\Support\Slug::make((string)($_POST['name'] ?? '')),
+            'slug'        => \App\Support\Slug::generate((string)($_POST['name'] ?? '')),
             'name'        => trim((string)($_POST['name'] ?? '')),
             'description' => trim((string)($_POST['description'] ?? '')),
             'engine'      => (string)($_POST['engine'] ?? ''),

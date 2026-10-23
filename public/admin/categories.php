@@ -18,7 +18,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         $data = [
             'id'          => (string)($_POST['id'] ?? ''),
             'name'        => trim((string)($_POST['name'] ?? '')),
-            'slug'        => \App\Support\Slug::make(trim((string)($_POST['name'] ?? ''))),
+            'slug'        => \App\Support\Slug::generate(trim((string)($_POST['name'] ?? ''))),
             'parent_id'   => (string)($_POST['parent_id'] ?? '') ?: null,
             'description' => trim((string)($_POST['description'] ?? '')),
         ];
