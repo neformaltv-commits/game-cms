@@ -61,8 +61,9 @@ final class SettingsServiceTest extends TestCase
     public function testSaveControlsHappyPath(): void
     {
         $game = $this->makeGame('ctl-ok');
-        $errors = $this->svc->saveControls($game['id'], ['left' => 'ArrowLeft,KeyA', 'dig_left' => ['KeyQ']]);
-        $this->assertSame([], $errors);
+        $res = $this->svc->saveControls($game['id'], ['left' => 'ArrowLeft,KeyA', 'dig_left' => ['KeyQ']]);
+        $this->assertTrue($res['ok']);
+        $this->assertSame([], $res['errors']);
         $fresh = $this->games->find($game['id']);
         $this->assertSame(['ArrowLeft', 'KeyA'], $fresh['controls']['left']);
         $this->assertSame(['KeyQ'], $fresh['controls']['dig_left']);
@@ -72,15 +73,32 @@ final class SettingsServiceTest extends TestCase
     public function testSaveControlsRejectsEmptyRequiredAndBadCode(): void
     {
         $game = $this->makeGame('ctl-bad');
-        $errors = $this->svc->saveControls($game['id'], ['left' => '']);
-        $this->assertTrue($errors !== []); // обязательное действие без клавиши
-        $errors = $this->svc->saveControls($game['id'], ['left' => '<img src=x>']);
-        $this->assertTrue($errors !== []); // невалидный KeyboardEvent.code
-        $errors = $this->svc->saveControls($game['id'], ['left' => 'KeyA,KeyB,KeyC']);
-        $this->assertTrue($errors !== []); // >2 клавиш
+        $res = $this->svc->saveControls($game['id'], ['left' => '']);
+        $this->assertFalse($res['ok']); // обязательное действие без клавиши
+        $res = $this->svc->saveControls($game['id'], ['left' => '<img src=x>']);
+        $this->assertFalse($res['ok']); // невалидный KeyboardEvent.code
+        $res = $this->svc->saveControls($game['id'], ['left' => 'KeyA,KeyB,KeyC']);
+        $this->assertFalse($res['ok']); // >2 клавиш
         // данные не изменились после ошибок (остались дефолты жанра)
         $fresh = $this->games->find($game['id']);
         $this->assertSame(['ArrowLeft', 'KeyA'], $fresh['controls']['left']);
+    }
+
+    /** §3.6/§10.6-40: пустой POST сохраняет прежние назначения; неактивные действия не трогаются. */
+    public function testSaveControlsKeepsDefaultsOnEmptySubmitAndIgnoresInactive(): void
+    {
+        $game = $this->makeGame('ctl-empty');
+        // игра создана с controls из genre.default_controls — сохранение без изменений значений
+        $res = $this->svc->saveControls($game['id'], []);
+        $this->assertTrue($res['ok']);
+        $fresh = $this->games->find($game['id']);
+        $this->assertTrue($fresh['controls']['left'] !== []); // дефолт жанра сохранился
+        // неактивное для движка действие из формы отбрасывается (§3.6): jump активен
+        // только при gravity-физике с jump_power < 0 — в дефолтах loderunner его нет
+        $res = $this->svc->saveControls($game['id'], ['jump' => 'KeyQ']);
+        $this->assertTrue($res['ok']);
+        $fresh = $this->games->find($game['id']);
+        $this->assertFalse(array_key_exists('jump', (array)$fresh['controls']));
     }
 
     public function testActiveActionsPerEngine(): void
@@ -105,7 +123,7 @@ final class SettingsServiceTest extends TestCase
     {
         $game = $this->makeGame('ctl-reset');
         $this->svc->saveControls($game['id'], ['left' => 'KeyH']);
-        $this->assertSame([], $this->svc->resetControls($game['id']));
+        $this->assertTrue($this->svc->resetControls($game['id'])['ok']);
         $fresh = $this->games->find($game['id']);
         $this->assertSame(['ArrowLeft', 'KeyA'], $fresh['controls']['left']);
         $this->assertContains('"action":"game.settings_reset"', $this->auditLines());
@@ -118,26 +136,26 @@ final class SettingsServiceTest extends TestCase
             ['event' => 'dig', 'wave' => 'square', 'frequency_hz' => 440, 'frequency_end_hz' => null, 'duration_ms' => 50, 'volume' => 0.03, 'envelope' => 'decay'],
             ['event' => 'win', 'wave' => 'triangle', 'frequency_hz' => 1760, 'frequency_end_hz' => null, 'duration_ms' => 250, 'volume' => 0.05, 'envelope' => 'pluck'],
         ]);
-        $this->assertSame([], $this->svc->saveSounds($game['id'], ['sounds_json' => $json]));
+        $this->assertTrue($this->svc->saveSounds($game['id'], ['sounds_json' => $json])['ok']);
         $fresh = $this->games->find($game['id']);
         $this->assertCount(2, $fresh['sounds']);
         // частота вне диапазона
         $bad = json_encode([['event' => 'hit', 'wave' => 'square', 'frequency_hz' => 5000, 'duration_ms' => 50, 'volume' => 0.1, 'envelope' => 'decay']]);
-        $this->assertTrue($this->svc->saveSounds($game['id'], ['sounds_json' => $bad]) !== []);
+        $this->assertFalse($this->svc->saveSounds($game['id'], ['sounds_json' => $bad])['ok']);
         // XSS в event отклоняется enum-валидацией
         $xss = json_encode([['event' => '<script>', 'wave' => 'square', 'frequency_hz' => 100, 'duration_ms' => 50, 'volume' => 0.1, 'envelope' => 'decay']]);
-        $this->assertTrue($this->svc->saveSounds($game['id'], ['sounds_json' => $xss]) !== []);
+        $this->assertFalse($this->svc->saveSounds($game['id'], ['sounds_json' => $xss])['ok']);
         $this->assertContains('game.sounds_update', $this->auditLines());
     }
 
     public function testSaveOverridesWhitelistAndErrors(): void
     {
         $game = $this->makeGame('ovr-ok');
-        $errors = $this->svc->saveOverrides($game['id'], [
+        $res = $this->svc->saveOverrides($game['id'], [
             'speed_scale' => '1.1', 'fps' => '30', 'sprite_flicker' => '1',
             'evil_field' => '999', 'physics' => ['gravity' => '0.5'],
         ]);
-        $this->assertSame([], $errors);
+        $this->assertTrue($res['ok']);
         $raw = json_decode((string)file_get_contents($this->dir . '/games/' . $game['id'] . '.json'), true);
         $this->assertSame(1.1, $raw['engine_overrides']['speed_scale']);
         $this->assertSame(30, $raw['engine_overrides']['fps']);
@@ -145,9 +163,9 @@ final class SettingsServiceTest extends TestCase
         $this->assertSame(0.5, $raw['engine_overrides']['physics']['gravity']);
         $this->assertFalse(isset($raw['engine_overrides']['evil_field'])); // white-list (§8)
         // вне диапазона
-        $this->assertTrue($this->svc->saveOverrides($game['id'], ['speed_scale' => '3.0']) !== []);
+        $this->assertFalse($this->svc->saveOverrides($game['id'], ['speed_scale' => '3.0'])['ok']);
         // movement_type × view_mode
-        $this->assertTrue($this->svc->saveOverrides($game['id'], ['movement_type' => 'top_down_8dir', 'view_mode' => 'side']) !== []);
+        $this->assertFalse($this->svc->saveOverrides($game['id'], ['movement_type' => 'top_down_8dir', 'view_mode' => 'side'])['ok']);
         $this->assertContains('game.engine_overrides_update', $this->auditLines());
     }
 
@@ -155,7 +173,7 @@ final class SettingsServiceTest extends TestCase
     {
         $game = $this->makeGame('ovr-reset');
         $this->svc->saveOverrides($game['id'], ['speed_scale' => '1.5']);
-        $this->assertSame([], $this->svc->resetOverridesToGenre($game['id']));
+        $this->assertTrue($this->svc->resetOverridesToGenre($game['id'])['ok']);
         $raw = json_decode((string)file_get_contents($this->dir . '/games/' . $game['id'] . '.json'), true);
         $this->assertSame([], $raw['engine_overrides']); // {} в JSON → [] при decode assoc
         $this->assertContains('"reset":["engine_overrides"]', $this->auditLines());
@@ -170,11 +188,11 @@ final class SettingsServiceTest extends TestCase
         // другой движок — ошибка
         $other = $this->games->create(['title' => 'Рейд', 'description' => str_repeat('р', 30), 'genre_id' => 'genre-riverraid', 'category_ids' => [], 'status' => 'draft', 'slug' => 'cp-other-engine']);
         assert($other['ok']);
-        $errs = $this->svc->copyFrom($g1['id'], $other['game']['id'], ['controls']);
-        $this->assertSame(['Источник должен быть того же движка.'], $errs);
+        $res = $this->svc->copyFrom($g1['id'], $other['game']['id'], ['controls']);
+        $this->assertSame(['Источник должен быть того же движка.'], $res['errors']);
         // тот же движок
-        $errs = $this->svc->copyFrom($g1['id'], $g2['id'], ['engine_overrides', 'nonsense']);
-        $this->assertSame([], $errs);
+        $res = $this->svc->copyFrom($g1['id'], $g2['id'], ['engine_overrides', 'nonsense']);
+        $this->assertTrue($res['ok']);
         $fresh = $this->games->find($g1['id']);
         $ovr = SettingsService::toArray($fresh['engine_overrides']);
         $this->assertSame(1.8, $ovr['speed_scale']);
@@ -189,6 +207,47 @@ final class SettingsServiceTest extends TestCase
         $this->assertTrue($errors !== []); // нет cover/уровней и т.д. — но и dig проверимpresence сообщения
         $joined = implode('|', $errors);
         $this->assertTrue(str_contains($joined, 'cover') || str_contains($joined, 'обложка'));
+    }
+
+    /** Единый контракт ответа ['ok'=>bool,'errors'=>list<string>] для всех методов (шаг 2). */
+    public function testNotFoundContractUniform(): void
+    {
+        $missing = 'game-not-exists';
+        foreach ([
+            fn () => $this->svc->resetControls($missing),
+            fn () => $this->svc->saveSounds($missing, ['sounds' => []]),
+            fn () => $this->svc->resetSounds($missing),
+            fn () => $this->svc->saveOverrides($missing, ['speed_scale' => 1]),
+            fn () => $this->svc->resetOverridesToGenre($missing),
+            fn () => $this->svc->copyFrom($missing, 'x', ['controls']),
+        ] as $call) {
+            $res = $call();
+            $this->assertFalse($res['ok']);
+            $this->assertSame(['Игра не найдена.'], $res['errors']);
+        }
+        // saveControls: проверка существования игры — до фильтрации действий (§3.6)
+        $res = $this->svc->saveControls($missing, ['left' => 'KeyA']);
+        $this->assertFalse($res['ok']);
+        $this->assertSame(['Игра не найдена.'], $res['errors']);
+    }
+
+    public function testResetSoundsToGenreDefaults(): void
+    {
+        $game = $this->makeGame('snd-reset');
+        $genre = $this->genres->find((string)$game['genre_id']);
+        $defaults = array_values((array)($genre['engine_config']['default_sounds'] ?? []));
+        // сохраняем один свой звук
+        $custom = [['event' => 'pickup', 'wave' => 'square', 'frequency_hz' => 440,
+            'duration_ms' => 80, 'volume' => 0.2, 'envelope' => 'decay']];
+        $res = $this->svc->saveSounds($game['id'], ['sounds' => $custom]);
+        $this->assertTrue($res['ok']);
+        $fresh = $this->games->find($game['id']);
+        $this->assertCount(1, (array)$fresh['sounds']);
+        // сброс -> дефолты жанра
+        $this->assertTrue($this->svc->resetSounds($game['id'])['ok']);
+        $fresh = $this->games->find($game['id']);
+        $this->assertSame($defaults, array_values((array)$fresh['sounds']));
+        $this->assertContains('"action":"game.settings_reset"', $this->auditLines());
     }
 
     private function auditLines(): string

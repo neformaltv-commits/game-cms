@@ -81,7 +81,7 @@ final class SettingsService
     {
         $ctx = $this->context($gameId);
         if ($ctx === null) {
-            return ['Игра не найдена.'];
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
         }
         $engine = (string)($ctx['genre']['engine'] ?? '');
         $legend = $this->games->effectiveLegend($ctx['game']);
@@ -91,10 +91,16 @@ final class SettingsService
         $controls = (array)($ctx['game']['controls'] ?? []);
         $changedActions = [];
         $addedKeys = [];
+        // В форме вкладки присутствуют только активные действия (§3.1); неактивные
+        // остаются в JSON как есть (§3.6). Пустой POST = ничего не редактируем.
+        $activeNames = array_merge($actions['required'], $actions['optional']);
         foreach ($input as $action => $raw) {
             $action = (string)$action;
             if (!in_array($action, SettingsValidator::ACTIONS, true)) {
                 continue; // неизвестное действие — отбрасываем
+            }
+            if (!in_array($action, $activeNames, true)) {
+                continue; // неактивное для движка/легенды действие не трогаем (§3.6)
             }
             $keys = is_array($raw)
                 ? array_values(array_filter(array_map(static fn ($k) => trim((string)$k), $raw)))
@@ -116,9 +122,26 @@ final class SettingsService
             }
         }
 
-        $errors = SettingsValidator::validateControls($controls, $actions['required']);
+        // Обязательные действия проверяются по merged-картине: значения формы поверх
+        // сохранённых controls (в т.ч. дефолтов жанра для старых игр без поля — §10.6-40).
+        $merged = $controls;
+        foreach ($input as $action => $raw) {
+            $action = (string)$action;
+            if (!in_array($action, SettingsValidator::ACTIONS, true) || !in_array($action, $activeNames, true)) {
+                continue;
+            }
+            $keys = is_array($raw)
+                ? array_values(array_filter(array_map(static fn ($k) => trim((string)$k), $raw)))
+                : array_values(array_filter(array_map('trim', explode(',', (string)$raw))));
+            if ($keys === []) {
+                unset($merged[$action]);
+            } else {
+                $merged[$action] = array_values(array_unique($keys));
+            }
+        }
+        $errors = SettingsValidator::validateControls($merged, $actions['required']);
         if ($errors !== []) {
-            return $errors; // данные не изменяются при ошибке валидации (§7.2)
+            return ['ok' => false, 'errors' => $errors]; // данные не изменяются при ошибке (§7.2)
         }
 
         $this->mutate($gameId, static function (array &$game) use ($controls): void {
@@ -129,7 +152,7 @@ final class SettingsService
             'changed_actions' => $changedActions,
             'added_keys' => $addedKeys,
         ]);
-        return [];
+        return ['ok' => true, 'errors' => []];
     }
 
     /** Сброс controls к genre.default_controls (§3.4). @return list<string> */
@@ -137,7 +160,7 @@ final class SettingsService
     {
         $ctx = $this->context($gameId);
         if ($ctx === null) {
-            return ['Игра не найдена.'];
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
         }
         $defaults = (array)($ctx['genre']['engine_config']['default_controls'] ?? []);
         $this->mutate($gameId, static function (array &$game) use ($defaults): void {
@@ -145,7 +168,7 @@ final class SettingsService
             $game['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
         });
         $this->audit->log('game.settings_reset', $gameId, ['reset' => ['controls'], 'from' => 'genre']);
-        return [];
+        return ['ok' => true, 'errors' => []];
     }
 
     /**
@@ -157,14 +180,16 @@ final class SettingsService
     {
         $ctx = $this->context($gameId);
         if ($ctx === null) {
-            return ['Игра не найдена.'];
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
         }
         if (isset($input['sounds_json']) && is_string($input['sounds_json'])) {
             $decoded = json_decode($input['sounds_json'], true);
             if (!is_array($decoded)) {
-                return ['sounds: повреждённые данные формы.'];
+                return ['ok' => false, 'errors' => ['sounds: повреждённые данные формы.']];
             }
             $sounds = $decoded;
+        } elseif (isset($input['sounds']) && is_array($input['sounds'])) {
+            $sounds = $input['sounds'];
         } else {
             $events = (array)($input['s_event'] ?? []);
             $sounds = [];
@@ -183,7 +208,7 @@ final class SettingsService
 
         $errors = SettingsValidator::validateSounds($sounds);
         if ($errors !== []) {
-            return $errors;
+            return ['ok' => false, 'errors' => $errors];
         }
 
         $oldEvents = array_column(array_map(static fn ($s) => (array)$s, (array)($ctx['game']['sounds'] ?? [])), 'event');
@@ -198,7 +223,7 @@ final class SettingsService
             $game['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
         });
         $this->audit->log('game.sounds_update', $gameId, ['changed_events' => $changedEvents]);
-        return [];
+        return ['ok' => true, 'errors' => []];
     }
 
     /** Сброс sounds к genre.default_sounds (§5.6). @return list<string> */
@@ -206,7 +231,7 @@ final class SettingsService
     {
         $ctx = $this->context($gameId);
         if ($ctx === null) {
-            return ['Игра не найдена.'];
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
         }
         $defaults = array_values((array)($ctx['genre']['engine_config']['default_sounds'] ?? []));
         $this->mutate($gameId, static function (array &$game) use ($defaults): void {
@@ -214,7 +239,7 @@ final class SettingsService
             $game['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
         });
         $this->audit->log('game.settings_reset', $gameId, ['reset' => ['sounds'], 'from' => 'genre']);
-        return [];
+        return ['ok' => true, 'errors' => []];
     }
 
     /**
@@ -226,13 +251,15 @@ final class SettingsService
     {
         $ctx = $this->context($gameId);
         if ($ctx === null) {
-            return ['Игра не найдена.'];
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
         }
         $engine = (string)($ctx['genre']['engine'] ?? '');
-        $overrides = self::normalize($input);
+        $source = isset($input['engine_overrides']) && is_array($input['engine_overrides'])
+            ? $input['engine_overrides'] : $input;
+        $overrides = self::normalize($source);
         $errors = SettingsValidator::validateOverrides($overrides, $engine);
         if ($errors !== []) {
-            return $errors;
+            return ['ok' => false, 'errors' => $errors];
         }
 
         $old = self::toArray($ctx['game']['engine_overrides'] ?? []);
@@ -243,21 +270,21 @@ final class SettingsService
             $game['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
         });
         $this->audit->log('game.engine_overrides_update', $gameId, ['changed' => $changed]);
-        return [];
+        return ['ok' => true, 'errors' => []];
     }
 
     /** Сброс engine_overrides к дефолтам жанра = пустой объект (§4.4). */
     public function resetOverridesToGenre(string $gameId): array
     {
         if ($this->context($gameId) === null) {
-            return ['Игра не найдена.'];
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
         }
         $this->mutate($gameId, static function (array &$game): void {
             $game['engine_overrides'] = new \stdClass();
             $game['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
         });
         $this->audit->log('game.settings_reset', $gameId, ['reset' => ['engine_overrides'], 'from' => 'genre']);
-        return [];
+        return ['ok' => true, 'errors' => []];
     }
 
     /**
@@ -270,20 +297,20 @@ final class SettingsService
         $ctx = $this->context($gameId);
         $src = $this->context($sourceId);
         if ($ctx === null) {
-            return ['Игра не найдена.'];
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
         }
         if ($src === null || $sourceId === $gameId) {
-            return ['Источник не найден.'];
+            return ['ok' => false, 'errors' => ['Источник не найден.']];
         }
         $e1 = (string)($ctx['genre']['engine'] ?? '');
         $e2 = (string)($src['genre']['engine'] ?? '');
         if ($e1 !== $e2) {
-            return ['Источник должен быть того же движка.'];
+            return ['ok' => false, 'errors' => ['Источник должен быть того же движка.']];
         }
         $allowed = ['controls', 'sounds', 'engine_overrides'];
         $fields = array_values(array_intersect($fields, $allowed));
         if ($fields === []) {
-            return ['Не выбрано ни одного поля для копирования.'];
+            return ['ok' => false, 'errors' => ['Не выбрано ни одного поля для копирования.']];
         }
         $this->mutate($gameId, static function (array &$game) use ($src, $fields): void {
             foreach ($fields as $f) {
@@ -297,7 +324,7 @@ final class SettingsService
             $game['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
         });
         $this->audit->log('game.settings_copy', $gameId, ['source' => $sourceId, 'fields' => $fields]);
-        return [];
+        return ['ok' => true, 'errors' => []];
     }
 
     /**

@@ -7,7 +7,6 @@ require __DIR__ . '/_layout.php';
 
 use App\Http\Response;
 use App\LevelService;
-use App\Support\EmojiUtil;
 
 $user = require_admin($app);
 csrf_guard();
@@ -128,7 +127,8 @@ if ($formLevel !== null && (string)$formLevel['id'] === $currentLevelId) {
 admin_header('Редактор: ' . (string)$game['title'], 'games');
 ?>
 <p><a href="games.php">← Все игры</a> | <b><?= e($game['title']) ?></b>
-   (жанр: <?= e((string)($genre['name'] ?? '?')) ?>, движок: <?= e($engine) ?>, статус: <?= e((string)$game['status']) ?>)</p>
+   (жанр: <?= e((string)($genre['name'] ?? '?')) ?>, движок: <?= e($engine) ?>, статус: <?= e((string)$game['status']) ?>)
+   | <a href="game-settings.php?id=<?= e($game['id']) ?>">Управление и настройки</a></p>
 
 <?php if ($legendErrors !== []): ?>
 <div class="flash flash-error"><b>Легенда жанра/игры невалидна:</b> <?= e(implode(' ', $legendErrors)) ?></div>
