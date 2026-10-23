@@ -8,6 +8,7 @@ use App\Audit\Logger;
 use App\Storage\FileStore;
 use App\Support\EmojiUtil;
 use App\Validation\LegendValidator;
+use App\Validation\TriggerValidator;
 
 /**
  * Уровни игры: сетка 32×24 (ТЗ блок 8).
@@ -197,6 +198,14 @@ final class LevelService
         if ($tl !== null && (!is_numeric($tl) || (int)$tl < 0 || (int)$tl > 9999)) {
             $errors[] = 'time_limit_s: целое 0–9999 или null.';
         }
+        // level.params (блок 10 §2.7–§2.11): триггеры и условия победы/поражения.
+        // Отсутствие params = старые игры работают как раньше (§10.9-62).
+        $params = $level['params'] ?? [];
+        if (!is_array($params)) {
+            $errors[] = 'params: ожидается объект.';
+            $params = [];
+        }
+        $errors = array_merge($errors, TriggerValidator::validate($params, $legend));
 
         $grid = $level['grid'] ?? null;
         if (!is_array($grid) || count($grid) !== self::ROWS) {
@@ -338,6 +347,291 @@ final class LevelService
             }
         }
         return $errors;
+    }
+
+    /**
+     * CRUD триггеров уровня (ТЗ блок 10 §4.4, §6.6). Все мутации — через save-путь:
+     * полная валидация уровня (TriggerValidator) выполняется до записи; при ошибке
+     * данные не изменяются (§7.2 «при ошибке — блокировка сохранения»).
+     * @return array{ok:bool,errors:list<string>,trigger:?array<string,mixed>}
+     */
+    public function createTrigger(string $gameId, string $levelId, array $input): array
+    {
+        $result = ['ok' => false, 'errors' => ['Уровень не найден.'], 'trigger' => null];
+        $this->mutateLevels($gameId, function (array &$levels, array $game) use ($levelId, $input, &$result): bool {
+            $idx = $this->indexOfLevel($levels, $levelId);
+            if ($idx === null) {
+                return false;
+            }
+            $level = $levels[$idx];
+            $params = (array)($level['params'] ?? []);
+            $triggers = (array)($params['triggers'] ?? []);
+            $trigger = self::normalizeTrigger($input, $this->nextTriggerId($triggers));
+            $errors = TriggerValidator::validate(
+                array_merge($params, ['triggers' => array_merge($triggers, [$trigger])]),
+                $this->games->effectiveLegend($game),
+            );
+            if ($errors !== []) {
+                $result = ['ok' => false, 'errors' => $errors, 'trigger' => null];
+                return false;
+            }
+            $triggers[] = $trigger;
+            $params['triggers'] = $triggers;
+            $level['params'] = $params;
+            $levels[$idx] = $level;
+            $result = ['ok' => true, 'errors' => [], 'trigger' => $trigger];
+            return true;
+        });
+        if ($result['ok']) {
+            $t = (array)$result['trigger'];
+            $this->audit->log('level.trigger_create', $gameId, [
+                'level_id' => $levelId,
+                'trigger_id' => (string)($t['id'] ?? ''),
+                'when_type' => (string)(is_array($t['when'] ?? null) ? ($t['when']['type'] ?? '') : ''),
+                'then_types' => array_column(array_map(static fn ($a) => (array)$a, (array)($t['then'] ?? [])), 'type'),
+            ]);
+        }
+        return $result;
+    }
+
+    /**
+     * Обновление триггера целиком (по id). @return array{ok:bool,errors:list<string>,trigger:?array}
+     */
+    public function updateTrigger(string $gameId, string $levelId, string $triggerId, array $input): array
+    {
+        $result = ['ok' => false, 'errors' => ['Триггер не найден.'], 'trigger' => null];
+        $changed = [];
+        $this->mutateLevels($gameId, function (array &$levels, array $game) use ($levelId, $triggerId, $input, &$result, &$changed): bool {
+            $idx = $this->indexOfLevel($levels, $levelId);
+            if ($idx === null) {
+                $result = ['ok' => false, 'errors' => ['Уровень не найден.'], 'trigger' => null];
+                return false;
+            }
+            $level = $levels[$idx];
+            $params = (array)($level['params'] ?? []);
+            $triggers = (array)($params['triggers'] ?? []);
+            $pos = null;
+            foreach ($triggers as $i => $t) {
+                if (is_array($t) && (string)($t['id'] ?? '') === $triggerId) {
+                    $pos = $i;
+                    break;
+                }
+            }
+            if ($pos === null) {
+                return false;
+            }
+            $old = (array)$triggers[$pos];
+            $trigger = self::normalizeTrigger($input, $triggerId);
+            $trial = $triggers;
+            $trial[$pos] = $trigger;
+            $errors = TriggerValidator::validate(
+                array_merge($params, ['triggers' => $trial]),
+                $this->games->effectiveLegend($game),
+            );
+            if ($errors !== []) {
+                $result = ['ok' => false, 'errors' => $errors, 'trigger' => null];
+                return false;
+            }
+            foreach (array_unique(array_merge(array_keys($old), array_keys($trigger))) as $k) {
+                if (json_encode($old[$k] ?? null) !== json_encode($trigger[$k] ?? null)) {
+                    $changed[] = (string)$k;
+                }
+            }
+            $triggers[$pos] = $trigger;
+            $params['triggers'] = $triggers;
+            $level['params'] = $params;
+            $levels[$idx] = $level;
+            $result = ['ok' => true, 'errors' => [], 'trigger' => $trigger];
+            return true;
+        });
+        if ($result['ok']) {
+            $this->audit->log('level.trigger_update', $gameId, [
+                'level_id' => $levelId, 'trigger_id' => $triggerId, 'changed' => $changed,
+            ]);
+        }
+        return $result;
+    }
+
+    /** @return list<string> ошибки */
+    public function deleteTrigger(string $gameId, string $levelId, string $triggerId): array
+    {
+        $error = null;
+        $found = false;
+        $this->mutateLevels($gameId, function (array &$levels) use ($levelId, $triggerId, &$error, &$found): bool {
+            $idx = $this->indexOfLevel($levels, $levelId);
+            if ($idx === null) {
+                $error = 'Уровень не найден.';
+                return false;
+            }
+            $level = $levels[$idx];
+            $params = (array)($level['params'] ?? []);
+            $triggers = (array)($params['triggers'] ?? []);
+            $kept = array_values(array_filter($triggers, static fn ($t) => is_array($t) && (string)($t['id'] ?? '') !== $triggerId));
+            if (count($kept) === count($triggers)) {
+                $error = 'Триггер не найден.';
+                return false;
+            }
+            $found = true;
+            $params['triggers'] = $kept;
+            $level['params'] = $params;
+            $levels[$idx] = $level;
+            return true;
+        });
+        if ($error !== null) {
+            return [$error];
+        }
+        $this->audit->log('level.trigger_delete', $gameId, ['level_id' => $levelId, 'trigger_id' => $triggerId]);
+        return [];
+    }
+
+    /**
+     * Сохранение условий победы/поражения уровня (§2.10–§2.11). Пустые массивы = снятие всех условий.
+     * @param array<string,mixed> $conditions ['victory_conditions' => list, 'defeat_conditions' => list]
+     * @return list<string> ошибки
+     */
+    public function saveWinLoseConditions(string $gameId, string $levelId, array $conditions): array
+    {
+        $game = $this->games->find($gameId);
+        if ($game === null) {
+            return ['Игра не найдена.'];
+        }
+        $legend = $this->games->effectiveLegend($game);
+        $errorsOut = [];
+        $saved = false;
+        $this->mutateLevels($gameId, function (array &$levels) use ($levelId, $conditions, $legend, &$errorsOut, &$saved): bool {
+            $idx = $this->indexOfLevel($levels, $levelId);
+            if ($idx === null) {
+                $errorsOut = ['Уровень не найден.'];
+                return false;
+            }
+            $level = $levels[$idx];
+            $params = (array)($level['params'] ?? []);
+            $trial = array_merge($params, [
+                'victory_conditions' => (array)($conditions['victory_conditions'] ?? []),
+                'defeat_conditions' => (array)($conditions['defeat_conditions'] ?? []),
+            ]);
+            $errors = TriggerValidator::validate($trial, $legend);
+            if ($errors !== []) {
+                $errorsOut = $errors;
+                return false;
+            }
+            $level['params'] = $trial;
+            $levels[$idx] = $level;
+            $saved = true;
+            return true;
+        });
+        if (!$saved) {
+            return $errorsOut;
+        }
+        $this->audit->log('level.winlose_conditions_update', $gameId, [
+            'level_id' => $levelId,
+            'victory' => array_column((array)($conditions['victory_conditions'] ?? []), 'type'),
+            'defeat' => array_column((array)($conditions['defeat_conditions'] ?? []), 'type'),
+        ]);
+        return [];
+    }
+
+    /** Следующий свободный trig-{NNN} в списке. @param list<mixed> $triggers */
+    private function nextTriggerId(array $triggers): string
+    {
+        $max = 0;
+        foreach ($triggers as $t) {
+            if (is_array($t) && preg_match('/^trig-(\d+)$/', (string)($t['id'] ?? ''), $m)) {
+                $max = max($max, (int)$m[1]);
+            }
+        }
+        return sprintf('trig-%03d', $max + 1);
+    }
+
+    /** @param list<array<string,mixed>> $levels @return int|null */
+    private function indexOfLevel(array $levels, string $levelId): ?int
+    {
+        foreach ($levels as $i => $lv) {
+            if (($lv['id'] ?? '') === $levelId) {
+                return $i;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Нормализация формы триггера → схема §2.7 (enum-валидация типов на следующем шаге).
+     * @param array<string,mixed> $input
+     * @return array<string,mixed>
+     */
+    public static function normalizeTrigger(array $input, string $id): array
+    {
+        $t = [
+            'id' => $id,
+            'name' => trim((string)($input['name'] ?? '')),
+            'enabled' => array_key_exists('enabled', $input)
+                ? (filter_var($input['enabled'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true)
+                : true,
+            'once' => array_key_exists('once', $input)
+                ? (filter_var($input['once'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true)
+                : true,
+            'when' => self::normalizeWhen((array)($input['when'] ?? [])),
+            'then' => self::normalizeThenList((array)($input['then'] ?? [])),
+        ];
+        return $t;
+    }
+
+    /** @param array<string,mixed> $when @return array<string,mixed> */
+    private static function normalizeWhen(array $when): array
+    {
+        $type = (string)($when['type'] ?? '');
+        $out = ['type' => $type];
+        $intFields = ['count', 'value', 'seconds', 'col', 'row', 'width', 'height'];
+        foreach ($intFields as $f) {
+            if (array_key_exists($f, $when) && is_numeric($when[$f])) {
+                $out[$f] = (int)$when[$f];
+            }
+        }
+        foreach (['target_emoji', 'pickup_id', 'emoji', 'flag_name', 'compare'] as $f) {
+            $v = trim((string)($when[$f] ?? ''));
+            if ($v !== '') {
+                $out[$f] = $v;
+            }
+        }
+        if ($type === 'all_of' || $type === 'any_of') {
+            $subs = [];
+            foreach ((array)($when['triggers'] ?? []) as $sub) {
+                if (is_array($sub)) {
+                    $subs[] = self::normalizeWhen($sub);
+                }
+            }
+            $out['triggers'] = $subs;
+        }
+        return $out;
+    }
+
+    /** @param list<mixed> $list @return list<array<string,mixed>> */
+    private static function normalizeThenList(array $list): array
+    {
+        $out = [];
+        foreach ($list as $act) {
+            if (!is_array($act)) {
+                continue;
+            }
+            $type = (string)($act['type'] ?? '');
+            $a = ['type' => $type];
+            foreach (['col', 'row', 'count', 'duration_ms', 'amount', 'delta', 'x', 'y'] as $f) {
+                if (array_key_exists($f, $act) && is_numeric($act[$f])) {
+                    $a[$f] = (int)$act[$f];
+                }
+            }
+            foreach (['emoji', 'level_id', 'text', 'event', 'flag_name', 'stat', 'direction'] as $f) {
+                if (array_key_exists($f, $act)) {
+                    $v = (string)$act[$f];
+                    if ($v !== '' || in_array($f, ['text'], true)) {
+                        $a[$f] = $v;
+                    }
+                }
+            }
+            // координаты spawn/set_tile приходят как col/row; zone teleport — x/y (совместимо с col/row)
+            $out[] = $a;
+        }
+        return $out;
     }
 
     /** Фоновый emoji для заполнения: первый background из default_legend жанра, иначе '.' */
