@@ -190,7 +190,83 @@ final class EmojiBankService
     }
 
     /**
-     * Заменяет изображение существующего static-эмодзи (id/codepoint сохраняются, ТЗ §6.3).
+     * Единая точка загрузки файла в банк (ТЗ §3.1–3.6): MIME -> формат-специфичная
+     * обработка -> сохранение. Используется и админкой, и preview-эндпоинтом.
+     *
+     * @return array{record?: array<string,mixed>, preview?: array{format:string,bytes:string,width:int,height:int}, errors?: list<string>}
+     */
+    public function ingestFile(string $tmpPath, string $name, string $category, bool $persist = true): array
+    {
+        if (!is_file($tmpPath)) {
+            throw new UploadException('Файл не найден');
+        }
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime = (string)$finfo->file($tmpPath);
+        $allowed = ['image/png', 'image/gif', 'image/svg+xml', 'text/xml', 'application/xml'];
+        if (!in_array($mime, $allowed, true)) {
+            throw new UploadException('Допустимы только PNG, GIF, SVG');
+        }
+        if (filesize($tmpPath) > 200 * 1024) {
+            throw new UploadException('Файл больше 200 KB');
+        }
+
+        if ($mime === 'image/png' || $mime === 'image/gif') {
+            $res = (new RasterReencoder())->reencodeToPng($tmpPath);
+            $preview = ['format' => 'png', 'bytes' => $res['png'], 'width' => $res['width'], 'height' => $res['height']];
+            if (!$persist) {
+                return ['preview' => $preview];
+            }
+            $record = $this->addStatic('png', $res['png'], $name, $category,
+                ['width' => $res['width'], 'height' => $res['height']], $mime === 'image/gif');
+            return ['record' => $record, 'preview' => $preview];
+        }
+
+        // SVG: xml-форматы принимаем только если корень <svg> (проверит санитайзер).
+        $raw = (string)file_get_contents($tmpPath);
+        $sanitized = (new GeometrySvgSanitizer())->sanitize($raw);
+        $w = $sanitized->sourceWidth ?? 64;
+        $h = $sanitized->sourceHeight ?? 64;
+        $preview = ['format' => 'svg', 'bytes' => $sanitized->xml, 'width' => $w, 'height' => $h];
+        if (!$persist) {
+            return ['preview' => $preview];
+        }
+        $record = $this->addStatic('svg', $sanitized->xml, $name, $category,
+            ['width' => $w, 'height' => $h], false, $sanitized->hash);
+        return ['record' => $record, 'preview' => $preview];
+    }
+
+    /**
+     * Заменяет изображение существующего static-эмодзи из файла (ТЗ §6.3).
+     */
+    public function replaceFromFile(string $id, string $tmpPath): array
+    {
+        $out = $this->ingestFile($tmpPath, '', '', false);
+        $p = $out['preview'];
+        if ($p['format'] === 'png') {
+            return $this->replaceImage($id, 'png', $p['bytes'],
+                ['width' => $p['width'], 'height' => $p['height']]);
+        }
+        return $this->replaceImage($id, 'svg', $p['bytes'],
+            ['width' => $p['width'], 'height' => $p['height']], false,
+            'sha256:' . hash('sha256', $p['bytes']));
+    }
+
+    /**
+     * Заменяет изображение с уже обработанными байтами (см. replaceImage) — обёртка для SVG-хэша.
+     */
+    public function addStaticFromPreview(array $preview, string $name, string $category): array
+    {
+        if ($preview['format'] === 'png') {
+            return $this->addStatic('png', $preview['bytes'], $name, $category,
+                ['width' => $preview['width'], 'height' => $preview['height']]);
+        }
+        return $this->addStatic('svg', $preview['bytes'], $name, $category,
+            ['width' => $preview['width'], 'height' => $preview['height']], false,
+            'sha256:' . hash('sha256', $preview['bytes']));
+    }
+
+    /**
+     * Заменяет изображение существующего static-эмодзи (ТЗ §6.3).
      */
     public function replaceImage(string $id, string $format, string $bytes, array $sourceSize, bool $isGifSource = false, ?string $sanitizedHash = null): array
     {
@@ -263,9 +339,14 @@ final class EmojiBankService
     public function createAnimation(string $name, string $category, array $frames, string $loopMode): array
     {
         $errors = $this->validateMeta($name, $category);
-        $errors = array_merge($errors, $this->validateFrames($frames), $this->validateLoopMode($loopMode));
         if ($errors !== []) {
             return ['errors' => $errors];
+        }
+
+        // Кадры валидируются ДО резервации слота (ТЗ §8.3): при ошибке счётчик не тратится.
+        $frameErrs = array_merge($this->validateFrames($frames), $this->validateLoopMode($loopMode));
+        if ($frameErrs !== []) {
+            return ['errors' => $frameErrs];
         }
 
         $slot = $this->allocateSlot();

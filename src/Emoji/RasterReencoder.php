@@ -46,9 +46,16 @@ final class RasterReencoder
         }
 
         // getimagesize до создания ресурса GD (§8.1, защита от bomb).
+        // Для PNG допускаем ancillary-чанки после IHDR (tEXt/iTXt/zTXt, pHYs, sRGB, gAMA, cHRM, tRNS):
+        // они законны по спецификации и будут отброшены ре-энкодом; размеры берём из IHDR.
         $info = @getimagesize($path);
         if ($info === false || empty($info[0]) || empty($info[1])) {
-            throw new UploadException('Не удалось прочитать изображение');
+            if ($mime === 'image/png') {
+                $info = self::pngHeaderInfo($path);
+            }
+            if ($info === false || empty($info[0]) || empty($info[1])) {
+                throw new UploadException('Не удалось прочитать изображение');
+            }
         }
         $width = (int)$info[0];
         $height = (int)$info[1];
@@ -57,11 +64,20 @@ final class RasterReencoder
             throw new UploadException("Размеры {$width}x{$height}: допустимо 8×8 … 256×256");
         }
 
-        $img = match ($mime) {
-            'image/png' => @imagecreatefrompng($path),
-            'image/gif' => @imagecreatefromgif($path), // первый кадр
-            default => false,
-        };
+        // Для PNG с ancillary-чанками (tEXt и т.п.) после IHDR libpng может вернуть false;
+        // в этом случае удаляем ancillary-чанки (ре-энкод их всё равно отбрасывает) и читаем заново.
+        $img = false;
+        if ($mime === 'image/gif') {
+            $img = @imagecreatefromgif($path); // первый кадр
+        } else {
+            $img = @imagecreatefrompng($path);
+            if ($img === false) {
+                $cleaned = self::pngStripAncillary($path);
+                if ($cleaned !== null) {
+                    $img = @imagecreatefromstring($cleaned);
+                }
+            }
+        }
         if ($img === false) {
             throw new UploadException('Изображение повреждено или не поддерживается');
         }
@@ -86,5 +102,68 @@ final class RasterReencoder
         }
 
         return ['png' => $bytes, 'width' => $width, 'height' => $height];
+    }
+
+    /**
+     * Размеры PNG из заголовка IHDR (без декодирования чанков).
+     * Возвращает массив в формате getimagesize() или false.
+     */
+    private static function pngHeaderInfo(string $path): array|false
+    {
+        $hdr = @file_get_contents($path, false, null, 0, 24);
+        if ($hdr === false || strlen($hdr) < 24) {
+            return false;
+        }
+        if (substr($hdr, 0, 8) !== "\x89PNG\r\n\x1a\n" || substr($hdr, 12, 4) !== 'IHDR') {
+            return false;
+        }
+        $dims = unpack('Nw/Nh', substr($hdr, 16, 8));
+        if ($dims === false) {
+            return false;
+        }
+        return [
+            0 => $dims['w'],
+            1 => $dims['h'],
+            'bits' => 8,
+            'channels' => 3,
+            'mime' => 'image/png',
+        ];
+    }
+
+    /**
+     * Удаляет из PNG все ancillary-чанки, оставляя сигнатуру, IHDR, IDAT (+tRNS), IEND.
+     * Используется как fallback: GD/libpng отказывает из-за метаданных, которые
+     * ре-энкод всё равно отбрасывает. Возвращает байты или null, если формат не распознан.
+     */
+    private static function pngStripAncillary(string $path): ?string
+    {
+        $data = @file_get_contents($path);
+        if ($data === false || strlen($data) < 8 || substr($data, 0, 8) !== "\x89PNG\r\n\x1a\n") {
+            return null;
+        }
+        $keep = ['IHDR', 'PLTE', 'IDAT', 'IEND', 'tRNS'];
+        $out = substr($data, 0, 8);
+        $pos = 8;
+        $len = strlen($data);
+        while ($pos + 8 <= $len) {
+            $chunkLenBin = substr($data, $pos, 4);
+            $type = substr($data, $pos + 4, 4);
+            $chunkLenArr = unpack('N', $chunkLenBin);
+            if ($chunkLenArr === false) {
+                return null;
+            }
+            $chunkLen = $chunkLenArr[1];
+            if ($chunkLen > $len - $pos - 8) {
+                return null; // обрезанный/битый файл
+            }
+            if (in_array($type, $keep, true)) {
+                $out .= substr($data, $pos, 8 + $chunkLen + 4);
+            }
+            if ($type === 'IEND') {
+                break;
+            }
+            $pos += 8 + $chunkLen + 4;
+        }
+        return $out;
     }
 }

@@ -1,0 +1,651 @@
+[
+  {
+    "id": "circular",
+    "name": "Круг",
+    "description": "",
+    "category": "curved",
+    "supported_engines": [
+      "static-screen",
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Defender (1980)",
+    "params": [
+      {
+        "key": "center_x",
+        "type": "number",
+        "min": 0,
+        "max": 32,
+        "default": 16,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "center_y",
+        "type": "number",
+        "min": 0,
+        "max": 24,
+        "default": 12,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "radius",
+        "type": "number",
+        "min": 0.5,
+        "max": 20,
+        "default": 4,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "angular_speed",
+        "type": "number",
+        "min": 1,
+        "max": 360,
+        "default": 90,
+        "unit": "deg/s",
+        "options": null
+      },
+      {
+        "key": "direction",
+        "type": "enum",
+        "min": null,
+        "max": null,
+        "default": "right",
+        "unit": null,
+        "options": [
+          "left",
+          "right"
+        ]
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "spiral_in",
+    "name": "Спираль внутрь",
+    "description": "",
+    "category": "curved",
+    "supported_engines": [
+      "vertical-scroll"
+    ],
+    "reference": "Galaga (1981) — пикирование",
+    "params": [
+      {
+        "key": "center_x",
+        "type": "number",
+        "min": 0,
+        "max": 32,
+        "default": 16,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "center_y",
+        "type": "number",
+        "min": 0,
+        "max": 24,
+        "default": 12,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "radius_start",
+        "type": "number",
+        "min": 1,
+        "max": 20,
+        "default": 10,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "radius_end",
+        "type": "number",
+        "min": 0,
+        "max": 20,
+        "default": 1,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "angular_speed",
+        "type": "number",
+        "min": 1,
+        "max": 360,
+        "default": 90,
+        "unit": "deg/s",
+        "options": null
+      },
+      {
+        "key": "duration_ms",
+        "type": "number",
+        "min": 100,
+        "max": 60000,
+        "default": 5000,
+        "unit": "ms",
+        "options": null
+      },
+      {
+        "key": "direction",
+        "type": "enum",
+        "min": null,
+        "max": null,
+        "default": "right",
+        "unit": null,
+        "options": [
+          "left",
+          "right"
+        ]
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "spiral_out",
+    "name": "Спираль наружу",
+    "description": "",
+    "category": "curved",
+    "supported_engines": [
+      "vertical-scroll"
+    ],
+    "reference": "Galaga (1981)",
+    "params": [],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "helix",
+    "name": "Винтовая спираль",
+    "description": "",
+    "category": "curved",
+    "supported_engines": [
+      "vertical-scroll"
+    ],
+    "reference": "Xevious (1982)",
+    "params": [
+      {
+        "key": "base_x",
+        "type": "number",
+        "min": 0,
+        "max": 32,
+        "default": 16,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "speed_vertical",
+        "type": "number",
+        "min": -5.0,
+        "max": 5.0,
+        "default": 1.0,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "radius",
+        "type": "number",
+        "min": 0.5,
+        "max": 20,
+        "default": 4,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "angular_speed",
+        "type": "number",
+        "min": 1,
+        "max": 360,
+        "default": 90,
+        "unit": "deg/s",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "figure8",
+    "name": "Восьмёрка",
+    "description": "",
+    "category": "curved",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Pac-Man (1980) — Clyde",
+    "params": [
+      {
+        "key": "center_x",
+        "type": "number",
+        "min": 0,
+        "max": 32,
+        "default": 16,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "center_y",
+        "type": "number",
+        "min": 0,
+        "max": 24,
+        "default": 12,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "amplitude_x",
+        "type": "number",
+        "min": 0.5,
+        "max": 16.0,
+        "default": 4.0,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "amplitude_y",
+        "type": "number",
+        "min": 0.5,
+        "max": 12.0,
+        "default": 3.0,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "frequency_hz",
+        "type": "number",
+        "min": 0.05,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "Hz",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "parabola",
+    "name": "Парабола",
+    "description": "",
+    "category": "curved",
+    "supported_engines": [
+      "static-screen",
+      "horizontal-scroll"
+    ],
+    "reference": "Donkey Kong (1981) — бочки",
+    "params": [
+      {
+        "key": "start_x",
+        "type": "number",
+        "min": 0,
+        "max": 32,
+        "default": 0,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "start_y",
+        "type": "number",
+        "min": 0,
+        "max": 24,
+        "default": 0,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "velocity_x",
+        "type": "number",
+        "min": -10.0,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "tiles/s",
+        "options": null
+      },
+      {
+        "key": "velocity_y",
+        "type": "number",
+        "min": -10.0,
+        "max": 10.0,
+        "default": 5.0,
+        "unit": "tiles/s",
+        "options": null
+      },
+      {
+        "key": "gravity",
+        "type": "number",
+        "min": 0.1,
+        "max": 20.0,
+        "default": 9.8,
+        "unit": "tiles/s2",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "loop",
+    "name": "Мёртвая петля",
+    "description": "",
+    "category": "curved",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Scramble (1981)",
+    "params": [
+      {
+        "key": "center_x",
+        "type": "number",
+        "min": 0,
+        "max": 32,
+        "default": 16,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "center_y",
+        "type": "number",
+        "min": 0,
+        "max": 24,
+        "default": 12,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "radius",
+        "type": "number",
+        "min": 0.5,
+        "max": 20,
+        "default": 4,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "angular_speed",
+        "type": "number",
+        "min": 1,
+        "max": 360,
+        "default": 90,
+        "unit": "deg/s",
+        "options": null
+      },
+      {
+        "key": "direction",
+        "type": "enum",
+        "min": null,
+        "max": null,
+        "default": "right",
+        "unit": null,
+        "options": [
+          "left",
+          "right"
+        ]
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "s_curve",
+    "name": "S-кривая",
+    "description": "",
+    "category": "curved",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Sopwith (1984, BMB)",
+    "params": [
+      {
+        "key": "amplitude",
+        "type": "number",
+        "min": 0.5,
+        "max": 10.0,
+        "default": 3.0,
+        "unit": null,
+        "options": null
+      },
+      {
+        "key": "period_tiles",
+        "type": "number",
+        "min": 1,
+        "max": 32,
+        "default": 8,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "infinity",
+    "name": "Бесконечность",
+    "description": "",
+    "category": "curved",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Defender (1980)",
+    "params": [
+      {
+        "key": "center_x",
+        "type": "number",
+        "min": 0,
+        "max": 32,
+        "default": 16,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "center_y",
+        "type": "number",
+        "min": 0,
+        "max": 24,
+        "default": 12,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "amplitude_x",
+        "type": "number",
+        "min": 0.5,
+        "max": 16.0,
+        "default": 4.0,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "amplitude_y",
+        "type": "number",
+        "min": 0.5,
+        "max": 12.0,
+        "default": 3.0,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "frequency_hz",
+        "type": "number",
+        "min": 0.05,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "Hz",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "orbit",
+    "name": "Орбита",
+    "description": "",
+    "category": "curved",
+    "supported_engines": [
+      "static-screen",
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Asteroids (1979) — НЛО",
+    "params": [
+      {
+        "key": "center_x",
+        "type": "number",
+        "min": 0,
+        "max": 32,
+        "default": 16,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "center_y",
+        "type": "number",
+        "min": 0,
+        "max": 24,
+        "default": 12,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "radius",
+        "type": "number",
+        "min": 0.5,
+        "max": 20,
+        "default": 4,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "angular_speed",
+        "type": "number",
+        "min": 1,
+        "max": 360,
+        "default": 90,
+        "unit": "deg/s",
+        "options": null
+      },
+      {
+        "key": "direction",
+        "type": "enum",
+        "min": null,
+        "max": null,
+        "default": "right",
+        "unit": null,
+        "options": [
+          "left",
+          "right"
+        ]
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "arc_swing",
+    "name": "Дуговое качание",
+    "description": "",
+    "category": "curved",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Donkey Kong (1981)",
+    "params": [
+      {
+        "key": "anchor_x",
+        "type": "number",
+        "min": 0,
+        "max": 32,
+        "default": 16,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "anchor_y",
+        "type": "number",
+        "min": 0,
+        "max": 24,
+        "default": 12,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "radius",
+        "type": "number",
+        "min": 0.5,
+        "max": 20,
+        "default": 4,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "sweep_deg",
+        "type": "number",
+        "min": 10,
+        "max": 180,
+        "default": 90,
+        "unit": "deg",
+        "options": null
+      },
+      {
+        "key": "period_ms",
+        "type": "number",
+        "min": 100,
+        "max": 10000,
+        "default": 1000,
+        "unit": "ms",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  }
+]

@@ -41,6 +41,7 @@ function services(?string $root = null): array
     $genres = new GenreService($store, $audit, $config['config_dir']);
     $categories = new CategoryService($store, $audit);
     $references = new ReferenceImporter($store);
+    $emojiBank = new \App\Emoji\EmojiBankService($store, $audit, $config['media_dir']);
 
-    return compact('config', 'store', 'audit', 'throttle', 'auth', 'limiter', 'genres', 'categories', 'references');
+    return compact('config', 'store', 'audit', 'throttle', 'auth', 'limiter', 'genres', 'categories', 'references', 'emojiBank');
 }
