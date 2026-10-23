@@ -109,6 +109,28 @@ final class GameService
     }
 
     /**
+     * Смена статуса: draft → published → archived.
+     * При переходе в published — полная проверка публикации (GameValidator, $forPublish=true).
+     * @return list<string> ошибки (пусто — статус изменён)
+     */
+    public function setStatus(string $id, string $status): array
+    {
+        if (!in_array($status, ['draft', 'published', 'archived'], true)) {
+            return ['Недопустимый статус.'];
+        }
+        $game = $this->find($id);
+        if ($game === null) {
+            return ['Игра не найдена.'];
+        }
+        $game['status'] = $status;
+        $errors = $this->save($game, $status === 'published');
+        if ($errors !== []) {
+            return $errors;
+        }
+        return [];
+    }
+
+    /**
      * Атомарное сохранение всей карточки. Поля, запрещённые к подмене из формы, уже исключены вызывающим.
      * @param array<string,mixed> $game
      * @return list<string> ошибки (пусто — сохранено)

@@ -118,7 +118,7 @@ final class SettingsService
 
         $errors = SettingsValidator::validateControls($controls, $actions['required']);
         if ($errors !== []) {
-            return $errors;
+            return $errors; // данные не изменяются при ошибке валидации (§7.2)
         }
 
         $this->mutate($gameId, static function (array &$game) use ($controls): void {
