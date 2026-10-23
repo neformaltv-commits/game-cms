@@ -22,7 +22,7 @@ CODE=$(curl -s -o /dev/null -w '%{http_code}' -b "$CJ" -c "$CJ" --data-urlencode
 check "POST login -> 302" 302 "$CODE"
 
 echo "== 2. Создание тестовой игры =="
-GENRE_ID=$(php -r '$d=json_decode(file_get_contents("data/genres.json"),true);echo $d[0]["id"];')
+GENRE_ID=genre-loderunner
 T=$(page_token "$BASE/admin/games.php")
 RES=$(curl -s -o /dev/null -w '%{http_code}' -b "$CJ" -c "$CJ" \
   --data-urlencode "action=create" \

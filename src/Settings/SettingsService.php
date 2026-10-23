@@ -91,10 +91,16 @@ final class SettingsService
         $controls = (array)($ctx['game']['controls'] ?? []);
         $changedActions = [];
         $addedKeys = [];
+        // В форме вкладки присутствуют только активные действия (§3.1); неактивные
+        // остаются в JSON как есть (§3.6). Пустой POST = ничего не редактируем.
+        $activeNames = array_merge($actions['required'], $actions['optional']);
         foreach ($input as $action => $raw) {
             $action = (string)$action;
             if (!in_array($action, SettingsValidator::ACTIONS, true)) {
                 continue; // неизвестное действие — отбрасываем
+            }
+            if (!in_array($action, $activeNames, true)) {
+                continue; // неактивное для движка/легенды действие не трогаем (§3.6)
             }
             $keys = is_array($raw)
                 ? array_values(array_filter(array_map(static fn ($k) => trim((string)$k), $raw)))
@@ -116,7 +122,24 @@ final class SettingsService
             }
         }
 
-        $errors = SettingsValidator::validateControls($controls, $actions['required']);
+        // Обязательные действия проверяются по merged-картине: значения формы поверх
+        // сохранённых controls (в т.ч. дефолтов жанра для старых игр без поля — §10.6-40).
+        $merged = $controls;
+        foreach ($input as $action => $raw) {
+            $action = (string)$action;
+            if (!in_array($action, SettingsValidator::ACTIONS, true) || !in_array($action, $activeNames, true)) {
+                continue;
+            }
+            $keys = is_array($raw)
+                ? array_values(array_filter(array_map(static fn ($k) => trim((string)$k), $raw)))
+                : array_values(array_filter(array_map('trim', explode(',', (string)$raw))));
+            if ($keys === []) {
+                unset($merged[$action]);
+            } else {
+                $merged[$action] = array_values(array_unique($keys));
+            }
+        }
+        $errors = SettingsValidator::validateControls($merged, $actions['required']);
         if ($errors !== []) {
             return ['ok' => false, 'errors' => $errors]; // данные не изменяются при ошибке (§7.2)
         }

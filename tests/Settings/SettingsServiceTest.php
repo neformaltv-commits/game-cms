@@ -84,6 +84,23 @@ final class SettingsServiceTest extends TestCase
         $this->assertSame(['ArrowLeft', 'KeyA'], $fresh['controls']['left']);
     }
 
+    /** §3.6/§10.6-40: пустой POST сохраняет прежние назначения; неактивные действия не трогаются. */
+    public function testSaveControlsKeepsDefaultsOnEmptySubmitAndIgnoresInactive(): void
+    {
+        $game = $this->makeGame('ctl-empty');
+        // игра создана с controls из genre.default_controls — сохранение без изменений значений
+        $res = $this->svc->saveControls($game['id'], []);
+        $this->assertTrue($res['ok']);
+        $fresh = $this->games->find($game['id']);
+        $this->assertTrue($fresh['controls']['left'] !== []); // дефолт жанра сохранился
+        // неактивное для движка действие из формы отбрасывается (§3.6): jump активен
+        // только при gravity-физике с jump_power < 0 — в дефолтах loderunner его нет
+        $res = $this->svc->saveControls($game['id'], ['jump' => 'KeyQ']);
+        $this->assertTrue($res['ok']);
+        $fresh = $this->games->find($game['id']);
+        $this->assertFalse(array_key_exists('jump', (array)$fresh['controls']));
+    }
+
     public function testActiveActionsPerEngine(): void
     {
         // effectiveLegend игры: default_legend жанра + legend игры (ТЗ блок 7 §5)
@@ -197,7 +214,6 @@ final class SettingsServiceTest extends TestCase
     {
         $missing = 'game-not-exists';
         foreach ([
-            fn () => $this->svc->saveControls($missing, ['left' => 'KeyA']),
             fn () => $this->svc->resetControls($missing),
             fn () => $this->svc->saveSounds($missing, ['sounds' => []]),
             fn () => $this->svc->resetSounds($missing),
@@ -209,6 +225,10 @@ final class SettingsServiceTest extends TestCase
             $this->assertFalse($res['ok']);
             $this->assertSame(['Игра не найдена.'], $res['errors']);
         }
+        // saveControls: проверка существования игры — до фильтрации действий (§3.6)
+        $res = $this->svc->saveControls($missing, ['left' => 'KeyA']);
+        $this->assertFalse($res['ok']);
+        $this->assertSame(['Игра не найдена.'], $res['errors']);
     }
 
     public function testResetSoundsToGenreDefaults(): void
