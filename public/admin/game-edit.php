@@ -7,7 +7,6 @@ require __DIR__ . '/_layout.php';
 
 use App\Http\Response;
 use App\LevelService;
-use App\Support\EmojiUtil;
 
 $user = require_admin($app);
 csrf_guard();
