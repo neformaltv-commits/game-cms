@@ -1,434 +1,434 @@
 [
-  {
-    "id": "item_guard",
-    "name": "Охраняет предмет",
-    "description": "",
-    "category": "advanced",
-    "supported_engines": [
-      "static-screen",
-      "horizontal-scroll"
-    ],
-    "reference": "Gauntlet (1985, Atari)",
-    "params": [
-      {
-        "key": "guard_position",
-        "type": "string",
-        "min": null,
-        "max": null,
-        "default": "",
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "vision_range",
-        "type": "number",
-        "min": 1,
-        "max": 30,
-        "default": 8,
-        "unit": "tiles",
-        "options": null
-      },
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "hive_mind",
-    "name": "Роевое поведение",
-    "description": "",
-    "category": "advanced",
-    "supported_engines": [
-      "static-screen",
-      "vertical-scroll"
-    ],
-    "reference": "Spy Hunter (1983, Bally Midway)",
-    "params": [
-      {
-        "key": "group_cooldown_ms",
-        "type": "number",
-        "min": 100,
-        "max": 20000,
-        "default": 3000,
-        "unit": "ms",
-        "options": null
-      },
-      {
-        "key": "role",
-        "type": "enum",
-        "min": null,
-        "max": null,
-        "default": "chaser",
-        "unit": null,
-        "options": [
-          "flanker",
-          "blocker",
-          "chaser"
-        ]
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "wave_attack",
-    "name": "Атака волнами",
-    "description": "",
-    "category": "advanced",
-    "supported_engines": [
-      "vertical-scroll"
-    ],
-    "reference": "Space Invaders (1978)",
-    "params": [
-      {
-        "key": "wave_size",
-        "type": "number",
-        "min": 1,
-        "max": 20,
-        "default": 4,
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "wave_interval_ms",
-        "type": "number",
-        "min": 100,
-        "max": 20000,
-        "default": 4000,
-        "unit": "ms",
-        "options": null
-      },
-      {
-        "key": "wave_speed_up_factor",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 1.2,
-        "unit": null,
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "revenge",
-    "name": "Ускорение после убийства сородича",
-    "description": "",
-    "category": "advanced",
-    "supported_engines": [
-      "static-screen",
-      "horizontal-scroll"
-    ],
-    "reference": "Gauntlet (1985)",
-    "params": [
-      {
-        "key": "trigger_range",
-        "type": "number",
-        "min": 1,
-        "max": 20,
-        "default": 4,
-        "unit": "tiles",
-        "options": null
-      },
-      {
-        "key": "speed_boost",
-        "type": "number",
-        "min": 0.1,
-        "max": 5.0,
-        "default": 1.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "duration_ms",
-        "type": "number",
-        "min": 100,
-        "max": 60000,
-        "default": 5000,
-        "unit": "ms",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "healer",
-    "name": "Лечит других мобов",
-    "description": "",
-    "category": "advanced",
-    "supported_engines": [
-      "static-screen",
-      "horizontal-scroll"
-    ],
-    "reference": "Gauntlet (Wizard)",
-    "params": [
-      {
-        "key": "heal_amount",
-        "type": "number",
-        "min": 1,
-        "max": 100,
-        "default": 10,
-        "unit": "hp",
-        "options": null
-      },
-      {
-        "key": "heal_rate_ms",
-        "type": "number",
-        "min": 100,
-        "max": 20000,
-        "default": 3000,
-        "unit": "ms",
-        "options": null
-      },
-      {
-        "key": "heal_radius",
-        "type": "number",
-        "min": 1,
-        "max": 10,
-        "default": 3,
-        "unit": "tiles",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "summoner",
-    "name": "Призывает боссов",
-    "description": "",
-    "category": "advanced",
-    "supported_engines": [
-      "static-screen",
-      "horizontal-scroll"
-    ],
-    "reference": "Bubble Bobble (1986)",
-    "params": [
-      {
-        "key": "boss_emoji",
-        "type": "string",
-        "min": null,
-        "max": null,
-        "default": "",
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "cooldown_ms",
-        "type": "number",
-        "min": 100,
-        "max": 60000,
-        "default": 10000,
-        "unit": "ms",
-        "options": null
-      },
-      {
-        "key": "max_bosses",
-        "type": "number",
-        "min": 1,
-        "max": 10,
-        "default": 1,
-        "unit": null,
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "swarm",
-    "name": "Летит роем",
-    "description": "",
-    "category": "advanced",
-    "supported_engines": [
-      "vertical-scroll"
-    ],
-    "reference": "Galaga (1981, Namco)",
-    "params": [
-      {
-        "key": "swarm_radius",
-        "type": "number",
-        "min": 1,
-        "max": 10,
-        "default": 3,
-        "unit": "tiles",
-        "options": null
-      },
-      {
-        "key": "swarm_speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 5.0,
-        "default": 1.0,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "cohesion",
-        "type": "number",
-        "min": 0,
-        "max": 1,
-        "default": 0.5,
-        "unit": null,
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "formation_leader",
-    "name": "Лидер формации",
-    "description": "",
-    "category": "advanced",
-    "supported_engines": [
-      "vertical-scroll"
-    ],
-    "reference": "Galaga (1981)",
-    "params": [
-      {
-        "key": "formation_type",
-        "type": "enum",
-        "min": null,
-        "max": null,
-        "default": "v",
-        "unit": null,
-        "options": [
-          "v",
-          "line",
-          "echelon"
-        ]
-      },
-      {
-        "key": "spacing",
-        "type": "number",
-        "min": 0.5,
-        "max": 10.0,
-        "default": 2.0,
-        "unit": "tiles",
-        "options": null
-      },
-      {
-        "key": "follower_ai",
-        "type": "string",
-        "min": null,
-        "max": null,
-        "default": "",
-        "unit": null,
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "escape_run",
-    "name": "Убегает при низком HP",
-    "description": "",
-    "category": "advanced",
-    "supported_engines": [
-      "static-screen",
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Bubble Bobble (1986)",
-    "params": [
-      {
-        "key": "hp_trigger_ratio",
-        "type": "number",
-        "min": 0,
-        "max": 1,
-        "default": 0.25,
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "flee_speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 5.0,
-        "default": 1.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "flee_direction",
-        "type": "enum",
-        "min": null,
-        "max": null,
-        "default": "right",
-        "unit": null,
-        "options": [
-          "left",
-          "right",
-          "up",
-          "down"
-        ]
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "splitter",
-    "name": "Делится при смерти",
-    "description": "",
-    "category": "advanced",
-    "supported_engines": [
-      "static-screen",
-      "horizontal-scroll"
-    ],
-    "reference": "Dragon Quest (1986, Enix) — Slimes",
-    "params": [
-      {
-        "key": "split_count",
-        "type": "number",
-        "min": 1,
-        "max": 10,
-        "default": 2,
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "child_emoji",
-        "type": "string",
-        "min": null,
-        "max": null,
-        "default": "",
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "child_hp",
-        "type": "number",
-        "min": 1,
-        "max": 100,
-        "default": 5,
-        "unit": "hp",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  }
+    {
+        "id": "item_guard",
+        "name": "Охраняет предмет",
+        "description": "Охраняет предмет — модель поведения из классических 8-битных игр: Gauntlet (1985, Atari).",
+        "category": "advanced",
+        "supported_engines": [
+            "static-screen",
+            "horizontal-scroll"
+        ],
+        "reference": "Gauntlet (1985, Atari)",
+        "params": [
+            {
+                "key": "guard_position",
+                "type": "string",
+                "min": null,
+                "max": null,
+                "default": "",
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "vision_range",
+                "type": "number",
+                "min": 1,
+                "max": 30,
+                "default": 8,
+                "unit": "tiles",
+                "options": null
+            },
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "hive_mind",
+        "name": "Роевое поведение",
+        "description": "Роевое поведение — модель поведения из классических 8-битных игр: Spy Hunter (1983, Bally Midway).",
+        "category": "advanced",
+        "supported_engines": [
+            "static-screen",
+            "vertical-scroll"
+        ],
+        "reference": "Spy Hunter (1983, Bally Midway)",
+        "params": [
+            {
+                "key": "group_cooldown_ms",
+                "type": "number",
+                "min": 100,
+                "max": 20000,
+                "default": 3000,
+                "unit": "ms",
+                "options": null
+            },
+            {
+                "key": "role",
+                "type": "enum",
+                "min": null,
+                "max": null,
+                "default": "chaser",
+                "unit": null,
+                "options": [
+                    "flanker",
+                    "blocker",
+                    "chaser"
+                ]
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "wave_attack",
+        "name": "Атака волнами",
+        "description": "Атака волнами — модель поведения из классических 8-битных игр: Space Invaders (1978).",
+        "category": "advanced",
+        "supported_engines": [
+            "vertical-scroll"
+        ],
+        "reference": "Space Invaders (1978)",
+        "params": [
+            {
+                "key": "wave_size",
+                "type": "number",
+                "min": 1,
+                "max": 20,
+                "default": 4,
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "wave_interval_ms",
+                "type": "number",
+                "min": 100,
+                "max": 20000,
+                "default": 4000,
+                "unit": "ms",
+                "options": null
+            },
+            {
+                "key": "wave_speed_up_factor",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 1.2,
+                "unit": null,
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "revenge",
+        "name": "Ускорение после убийства сородича",
+        "description": "Ускорение после убийства сородича — модель поведения из классических 8-битных игр: Gauntlet (1985).",
+        "category": "advanced",
+        "supported_engines": [
+            "static-screen",
+            "horizontal-scroll"
+        ],
+        "reference": "Gauntlet (1985)",
+        "params": [
+            {
+                "key": "trigger_range",
+                "type": "number",
+                "min": 1,
+                "max": 20,
+                "default": 4,
+                "unit": "tiles",
+                "options": null
+            },
+            {
+                "key": "speed_boost",
+                "type": "number",
+                "min": 0.1,
+                "max": 5,
+                "default": 1.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "duration_ms",
+                "type": "number",
+                "min": 100,
+                "max": 60000,
+                "default": 5000,
+                "unit": "ms",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "healer",
+        "name": "Лечит других мобов",
+        "description": "Лечит других мобов — модель поведения из классических 8-битных игр: Gauntlet (Wizard).",
+        "category": "advanced",
+        "supported_engines": [
+            "static-screen",
+            "horizontal-scroll"
+        ],
+        "reference": "Gauntlet (Wizard)",
+        "params": [
+            {
+                "key": "heal_amount",
+                "type": "number",
+                "min": 1,
+                "max": 100,
+                "default": 10,
+                "unit": "hp",
+                "options": null
+            },
+            {
+                "key": "heal_rate_ms",
+                "type": "number",
+                "min": 100,
+                "max": 20000,
+                "default": 3000,
+                "unit": "ms",
+                "options": null
+            },
+            {
+                "key": "heal_radius",
+                "type": "number",
+                "min": 1,
+                "max": 10,
+                "default": 3,
+                "unit": "tiles",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "summoner",
+        "name": "Призывает боссов",
+        "description": "Призывает боссов — модель поведения из классических 8-битных игр: Bubble Bobble (1986).",
+        "category": "advanced",
+        "supported_engines": [
+            "static-screen",
+            "horizontal-scroll"
+        ],
+        "reference": "Bubble Bobble (1986)",
+        "params": [
+            {
+                "key": "boss_emoji",
+                "type": "string",
+                "min": null,
+                "max": null,
+                "default": "",
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "cooldown_ms",
+                "type": "number",
+                "min": 100,
+                "max": 60000,
+                "default": 10000,
+                "unit": "ms",
+                "options": null
+            },
+            {
+                "key": "max_bosses",
+                "type": "number",
+                "min": 1,
+                "max": 10,
+                "default": 1,
+                "unit": null,
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "swarm",
+        "name": "Летит роем",
+        "description": "Летит роем — модель поведения из классических 8-битных игр: Galaga (1981, Namco).",
+        "category": "advanced",
+        "supported_engines": [
+            "vertical-scroll"
+        ],
+        "reference": "Galaga (1981, Namco)",
+        "params": [
+            {
+                "key": "swarm_radius",
+                "type": "number",
+                "min": 1,
+                "max": 10,
+                "default": 3,
+                "unit": "tiles",
+                "options": null
+            },
+            {
+                "key": "swarm_speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 5,
+                "default": 1,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "cohesion",
+                "type": "number",
+                "min": 0,
+                "max": 1,
+                "default": 0.5,
+                "unit": null,
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "formation_leader",
+        "name": "Лидер формации",
+        "description": "Лидер формации — модель поведения из классических 8-битных игр: Galaga (1981).",
+        "category": "advanced",
+        "supported_engines": [
+            "vertical-scroll"
+        ],
+        "reference": "Galaga (1981)",
+        "params": [
+            {
+                "key": "formation_type",
+                "type": "enum",
+                "min": null,
+                "max": null,
+                "default": "v",
+                "unit": null,
+                "options": [
+                    "v",
+                    "line",
+                    "echelon"
+                ]
+            },
+            {
+                "key": "spacing",
+                "type": "number",
+                "min": 0.5,
+                "max": 10,
+                "default": 2,
+                "unit": "tiles",
+                "options": null
+            },
+            {
+                "key": "follower_ai",
+                "type": "string",
+                "min": null,
+                "max": null,
+                "default": "",
+                "unit": null,
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "escape_run",
+        "name": "Убегает при низком HP",
+        "description": "Убегает при низком HP — модель поведения из классических 8-битных игр: Bubble Bobble (1986).",
+        "category": "advanced",
+        "supported_engines": [
+            "static-screen",
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Bubble Bobble (1986)",
+        "params": [
+            {
+                "key": "hp_trigger_ratio",
+                "type": "number",
+                "min": 0,
+                "max": 1,
+                "default": 0.25,
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "flee_speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 5,
+                "default": 1.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "flee_direction",
+                "type": "enum",
+                "min": null,
+                "max": null,
+                "default": "right",
+                "unit": null,
+                "options": [
+                    "left",
+                    "right",
+                    "up",
+                    "down"
+                ]
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "splitter",
+        "name": "Делится при смерти",
+        "description": "Делится при смерти — модель поведения из классических 8-битных игр: Dragon Quest (1986, Enix) — Slimes.",
+        "category": "advanced",
+        "supported_engines": [
+            "static-screen",
+            "horizontal-scroll"
+        ],
+        "reference": "Dragon Quest (1986, Enix) — Slimes",
+        "params": [
+            {
+                "key": "split_count",
+                "type": "number",
+                "min": 1,
+                "max": 10,
+                "default": 2,
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "child_emoji",
+                "type": "string",
+                "min": null,
+                "max": null,
+                "default": "",
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "child_hp",
+                "type": "number",
+                "min": 1,
+                "max": 100,
+                "default": 5,
+                "unit": "hp",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    }
 ]

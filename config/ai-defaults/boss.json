@@ -1,189 +1,189 @@
 [
-  {
-    "id": "boss_phases",
-    "name": "Босс с фазами",
-    "description": "",
-    "category": "boss",
-    "supported_engines": [
-      "static-screen",
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Wonder Boy (1986, Sega)",
-    "params": [],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "boss_pattern_cycle",
-    "name": "Циклический паттерн",
-    "description": "",
-    "category": "boss",
-    "supported_engines": [
-      "static-screen",
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Pac-Man (1980) — финальный босс",
-    "params": [],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "boss_summon_wave",
-    "name": "Вызов волн",
-    "description": "",
-    "category": "boss",
-    "supported_engines": [
-      "static-screen",
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Bubble Bobble (1986)",
-    "params": [
-      {
-        "key": "spawn_emoji",
-        "type": "string",
-        "min": null,
-        "max": null,
-        "default": "",
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "wave_size",
-        "type": "number",
-        "min": 1,
-        "max": 20,
-        "default": 4,
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "cooldown_ms",
-        "type": "number",
-        "min": 100,
-        "max": 60000,
-        "default": 10000,
-        "unit": "ms",
-        "options": null
-      },
-      {
-        "key": "base_ai_model",
-        "type": "string",
-        "min": null,
-        "max": null,
-        "default": "",
-        "unit": null,
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "boss_weak_point",
-    "name": "Уязвимая точка",
-    "description": "",
-    "category": "boss",
-    "supported_engines": [
-      "horizontal-scroll"
-    ],
-    "reference": "Wonder Boy (1986)",
-    "params": [
-      {
-        "key": "weak_point_offset",
-        "type": "string",
-        "min": null,
-        "max": null,
-        "default": "",
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "invulnerable_period_ms",
-        "type": "number",
-        "min": 0,
-        "max": 10000,
-        "default": 1000,
-        "unit": "ms",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "boss_enrage",
-    "name": "Ярость при низком HP",
-    "description": "",
-    "category": "boss",
-    "supported_engines": [
-      "static-screen",
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Asterix (1983, Atari)",
-    "params": [
-      {
-        "key": "hp_trigger_ratio",
-        "type": "number",
-        "min": 0,
-        "max": 1,
-        "default": 0.25,
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "speed_multiplier",
-        "type": "number",
-        "min": 0.1,
-        "max": 5.0,
-        "default": 2.0,
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "attack_rate_multiplier",
-        "type": "number",
-        "min": 0.1,
-        "max": 5.0,
-        "default": 0.5,
-        "unit": null,
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "boss_multi_head",
-    "name": "Многоголовый",
-    "description": "",
-    "category": "boss",
-    "supported_engines": [
-      "static-screen",
-      "horizontal-scroll"
-    ],
-    "reference": "Myth (1989) — Гидра",
-    "params": [
-      {
-        "key": "shared_hp",
-        "type": "boolean",
-        "min": null,
-        "max": null,
-        "default": false,
-        "unit": null,
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  }
+    {
+        "id": "boss_phases",
+        "name": "Босс с фазами",
+        "description": "Босс с фазами — модель поведения из классических 8-битных игр: Wonder Boy (1986, Sega).",
+        "category": "boss",
+        "supported_engines": [
+            "static-screen",
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Wonder Boy (1986, Sega)",
+        "params": [],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "boss_pattern_cycle",
+        "name": "Циклический паттерн",
+        "description": "Циклический паттерн — модель поведения из классических 8-битных игр: Pac-Man (1980) — финальный босс.",
+        "category": "boss",
+        "supported_engines": [
+            "static-screen",
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Pac-Man (1980) — финальный босс",
+        "params": [],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "boss_summon_wave",
+        "name": "Вызов волн",
+        "description": "Вызов волн — модель поведения из классических 8-битных игр: Bubble Bobble (1986).",
+        "category": "boss",
+        "supported_engines": [
+            "static-screen",
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Bubble Bobble (1986)",
+        "params": [
+            {
+                "key": "spawn_emoji",
+                "type": "string",
+                "min": null,
+                "max": null,
+                "default": "",
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "wave_size",
+                "type": "number",
+                "min": 1,
+                "max": 20,
+                "default": 4,
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "cooldown_ms",
+                "type": "number",
+                "min": 100,
+                "max": 60000,
+                "default": 10000,
+                "unit": "ms",
+                "options": null
+            },
+            {
+                "key": "base_ai_model",
+                "type": "string",
+                "min": null,
+                "max": null,
+                "default": "",
+                "unit": null,
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "boss_weak_point",
+        "name": "Уязвимая точка",
+        "description": "Уязвимая точка — модель поведения из классических 8-битных игр: Wonder Boy (1986).",
+        "category": "boss",
+        "supported_engines": [
+            "horizontal-scroll"
+        ],
+        "reference": "Wonder Boy (1986)",
+        "params": [
+            {
+                "key": "weak_point_offset",
+                "type": "string",
+                "min": null,
+                "max": null,
+                "default": "",
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "invulnerable_period_ms",
+                "type": "number",
+                "min": 0,
+                "max": 10000,
+                "default": 1000,
+                "unit": "ms",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "boss_enrage",
+        "name": "Ярость при низком HP",
+        "description": "Ярость при низком HP — модель поведения из классических 8-битных игр: Asterix (1983, Atari).",
+        "category": "boss",
+        "supported_engines": [
+            "static-screen",
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Asterix (1983, Atari)",
+        "params": [
+            {
+                "key": "hp_trigger_ratio",
+                "type": "number",
+                "min": 0,
+                "max": 1,
+                "default": 0.25,
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "speed_multiplier",
+                "type": "number",
+                "min": 0.1,
+                "max": 5,
+                "default": 2,
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "attack_rate_multiplier",
+                "type": "number",
+                "min": 0.1,
+                "max": 5,
+                "default": 0.5,
+                "unit": null,
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "boss_multi_head",
+        "name": "Многоголовый",
+        "description": "Многоголовый — модель поведения из классических 8-битных игр: Myth (1989) — Гидра.",
+        "category": "boss",
+        "supported_engines": [
+            "static-screen",
+            "horizontal-scroll"
+        ],
+        "reference": "Myth (1989) — Гидра",
+        "params": [
+            {
+                "key": "shared_hp",
+                "type": "boolean",
+                "min": null,
+                "max": null,
+                "default": false,
+                "unit": null,
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    }
 ]

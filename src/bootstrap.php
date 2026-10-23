@@ -42,6 +42,8 @@ function services(?string $root = null): array
     $categories = new CategoryService($store, $audit);
     $references = new ReferenceImporter($store);
     $emojiBank = new \App\Emoji\EmojiBankService($store, $audit, $config['media_dir']);
+    $aiModels = new \App\Library\LibraryService($store, $audit, \App\Library\LibraryService::KIND_AI);
+    $patterns = new \App\Library\LibraryService($store, $audit, \App\Library\LibraryService::KIND_PATTERN);
 
-    return compact('config', 'store', 'audit', 'throttle', 'auth', 'limiter', 'genres', 'categories', 'references', 'emojiBank');
+    return compact('config', 'store', 'audit', 'throttle', 'auth', 'limiter', 'genres', 'categories', 'references', 'emojiBank', 'aiModels', 'patterns');
 }

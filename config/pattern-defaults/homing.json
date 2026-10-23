@@ -1,315 +1,315 @@
 [
-  {
-    "id": "homing_direct",
-    "name": "Прямое самонаведение",
-    "description": "",
-    "category": "homing",
-    "supported_engines": [
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Missile Command (1980, Atari)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "lifetime_ms",
-        "type": "number",
-        "min": 100,
-        "max": 30000,
-        "default": 5000,
-        "unit": "ms",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  },
-  {
-    "id": "homing_curved",
-    "name": "С ограниченным поворотом",
-    "description": "",
-    "category": "homing",
-    "supported_engines": [
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Defender (1980) — Baiters",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "turn_rate_deg_per_sec",
-        "type": "number",
-        "min": 10,
-        "max": 720,
-        "default": 180,
-        "unit": "deg/s",
-        "options": null
-      },
-      {
-        "key": "tracking_time_ms",
-        "type": "number",
-        "min": 100,
-        "max": 30000,
-        "default": 3000,
-        "unit": "ms",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  },
-  {
-    "id": "dive",
-    "name": "Пикирование",
-    "description": "",
-    "category": "homing",
-    "supported_engines": [
-      "vertical-scroll"
-    ],
-    "reference": "Xevious (1982)",
-    "params": [
-      {
-        "key": "speed_start",
-        "type": "number",
-        "min": 0.1,
-        "max": 10.0,
-        "default": 1.0,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "speed_end",
-        "type": "number",
-        "min": 0.1,
-        "max": 20.0,
-        "default": 4.0,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "accel",
-        "type": "number",
-        "min": 0.01,
-        "max": 2.0,
-        "default": 0.1,
-        "unit": "tiles/frame2",
-        "options": null
-      },
-      {
-        "key": "lock_target_at",
-        "type": "number",
-        "min": 0,
-        "max": 24,
-        "default": 8,
-        "unit": "tiles",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  },
-  {
-    "id": "swoop",
-    "name": "Заход с разворотом",
-    "description": "",
-    "category": "homing",
-    "supported_engines": [
-      "vertical-scroll"
-    ],
-    "reference": "Galaga (1981)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "swoop_depth",
-        "type": "number",
-        "min": 1,
-        "max": 24,
-        "default": 8,
-        "unit": "tiles",
-        "options": null
-      },
-      {
-        "key": "turn_radius",
-        "type": "number",
-        "min": 0.5,
-        "max": 20,
-        "default": 4,
-        "unit": "tiles",
-        "options": null
-      },
-      {
-        "key": "reenter",
-        "type": "enum",
-        "min": null,
-        "max": null,
-        "default": "top",
-        "unit": null,
-        "options": [
-          "top",
-          "bottom"
-        ]
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  },
-  {
-    "id": "kamikaze_dive",
-    "name": "Камикадзе-пикирование",
-    "description": "",
-    "category": "homing",
-    "supported_engines": [
-      "vertical-scroll"
-    ],
-    "reference": "Bomb Jack (1984)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "trigger_range",
-        "type": "number",
-        "min": 1,
-        "max": 20,
-        "default": 4,
-        "unit": "tiles",
-        "options": null
-      },
-      {
-        "key": "explosion_radius",
-        "type": "number",
-        "min": 0.5,
-        "max": 8.0,
-        "default": 2.0,
-        "unit": "tiles",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  },
-  {
-    "id": "tracking_missile",
-    "name": "Самонаводящаяся ракета",
-    "description": "",
-    "category": "homing",
-    "supported_engines": [
-      "vertical-scroll"
-    ],
-    "reference": "Missile Command (1980)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "turn_rate_deg_per_sec",
-        "type": "number",
-        "min": 10,
-        "max": 720,
-        "default": 180,
-        "unit": "deg/s",
-        "options": null
-      },
-      {
-        "key": "fuel_ms",
-        "type": "number",
-        "min": 100,
-        "max": 30000,
-        "default": 5000,
-        "unit": "ms",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  },
-  {
-    "id": "lead_pursuit",
-    "name": "С упреждением",
-    "description": "",
-    "category": "homing",
-    "supported_engines": [
-      "vertical-scroll"
-    ],
-    "reference": "Sopwith (1984)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "lookahead_frames",
-        "type": "number",
-        "min": 1,
-        "max": 60,
-        "default": 10,
-        "unit": "frames",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  }
+    {
+        "id": "homing_direct",
+        "name": "Прямое самонаведение",
+        "description": "Прямое самонаведение — модель поведения из классических 8-битных игр: Missile Command (1980, Atari).",
+        "category": "homing",
+        "supported_engines": [
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Missile Command (1980, Atari)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "lifetime_ms",
+                "type": "number",
+                "min": 100,
+                "max": 30000,
+                "default": 5000,
+                "unit": "ms",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    },
+    {
+        "id": "homing_curved",
+        "name": "С ограниченным поворотом",
+        "description": "С ограниченным поворотом — модель поведения из классических 8-битных игр: Defender (1980) — Baiters.",
+        "category": "homing",
+        "supported_engines": [
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Defender (1980) — Baiters",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "turn_rate_deg_per_sec",
+                "type": "number",
+                "min": 10,
+                "max": 720,
+                "default": 180,
+                "unit": "deg/s",
+                "options": null
+            },
+            {
+                "key": "tracking_time_ms",
+                "type": "number",
+                "min": 100,
+                "max": 30000,
+                "default": 3000,
+                "unit": "ms",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    },
+    {
+        "id": "dive",
+        "name": "Пикирование",
+        "description": "Пикирование — модель поведения из классических 8-битных игр: Xevious (1982).",
+        "category": "homing",
+        "supported_engines": [
+            "vertical-scroll"
+        ],
+        "reference": "Xevious (1982)",
+        "params": [
+            {
+                "key": "speed_start",
+                "type": "number",
+                "min": 0.1,
+                "max": 10,
+                "default": 1,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "speed_end",
+                "type": "number",
+                "min": 0.1,
+                "max": 20,
+                "default": 4,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "accel",
+                "type": "number",
+                "min": 0.01,
+                "max": 2,
+                "default": 0.1,
+                "unit": "tiles/frame2",
+                "options": null
+            },
+            {
+                "key": "lock_target_at",
+                "type": "number",
+                "min": 0,
+                "max": 24,
+                "default": 8,
+                "unit": "tiles",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    },
+    {
+        "id": "swoop",
+        "name": "Заход с разворотом",
+        "description": "Заход с разворотом — модель поведения из классических 8-битных игр: Galaga (1981).",
+        "category": "homing",
+        "supported_engines": [
+            "vertical-scroll"
+        ],
+        "reference": "Galaga (1981)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "swoop_depth",
+                "type": "number",
+                "min": 1,
+                "max": 24,
+                "default": 8,
+                "unit": "tiles",
+                "options": null
+            },
+            {
+                "key": "turn_radius",
+                "type": "number",
+                "min": 0.5,
+                "max": 20,
+                "default": 4,
+                "unit": "tiles",
+                "options": null
+            },
+            {
+                "key": "reenter",
+                "type": "enum",
+                "min": null,
+                "max": null,
+                "default": "top",
+                "unit": null,
+                "options": [
+                    "top",
+                    "bottom"
+                ]
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    },
+    {
+        "id": "kamikaze_dive",
+        "name": "Камикадзе-пикирование",
+        "description": "Камикадзе-пикирование — модель поведения из классических 8-битных игр: Bomb Jack (1984).",
+        "category": "homing",
+        "supported_engines": [
+            "vertical-scroll"
+        ],
+        "reference": "Bomb Jack (1984)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "trigger_range",
+                "type": "number",
+                "min": 1,
+                "max": 20,
+                "default": 4,
+                "unit": "tiles",
+                "options": null
+            },
+            {
+                "key": "explosion_radius",
+                "type": "number",
+                "min": 0.5,
+                "max": 8,
+                "default": 2,
+                "unit": "tiles",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    },
+    {
+        "id": "tracking_missile",
+        "name": "Самонаводящаяся ракета",
+        "description": "Самонаводящаяся ракета — модель поведения из классических 8-битных игр: Missile Command (1980).",
+        "category": "homing",
+        "supported_engines": [
+            "vertical-scroll"
+        ],
+        "reference": "Missile Command (1980)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "turn_rate_deg_per_sec",
+                "type": "number",
+                "min": 10,
+                "max": 720,
+                "default": 180,
+                "unit": "deg/s",
+                "options": null
+            },
+            {
+                "key": "fuel_ms",
+                "type": "number",
+                "min": 100,
+                "max": 30000,
+                "default": 5000,
+                "unit": "ms",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    },
+    {
+        "id": "lead_pursuit",
+        "name": "С упреждением",
+        "description": "С упреждением — модель поведения из классических 8-битных игр: Sopwith (1984).",
+        "category": "homing",
+        "supported_engines": [
+            "vertical-scroll"
+        ],
+        "reference": "Sopwith (1984)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "lookahead_frames",
+                "type": "number",
+                "min": 1,
+                "max": 60,
+                "default": 10,
+                "unit": "frames",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    }
 ]
