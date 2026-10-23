@@ -1,0 +1,10 @@
+/data/*
+!/data/.gitkeep
+/config/secrets.php
+/public/media/*
+!/public/media/.gitkeep
+/vendor/
+*.tar.gz
+*.bak
+.DS_Store
+server.log

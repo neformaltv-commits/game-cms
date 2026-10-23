@@ -10,6 +10,7 @@ declare(strict_types=1);
 $root = dirname(__DIR__);
 
 require $root . '/src/autoload.php';
+require $root . '/src/bootstrap.php';
 
 $app = \App\services($root);
 
