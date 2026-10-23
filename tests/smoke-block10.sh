@@ -50,16 +50,15 @@ check "GET game-combat без сессии -> 302" 302 "$CODE"
 
 echo "== 4. Сохранение атак игрока (melee включён) =="
 # назначаем клавишу действию fire (жанр loderunner её не имеет по умолчанию) — иначе melee запрещён валидатором
+# форма с пустыми значениями обязательных действий (см. smoke-stage5): сохранённые controls остаются валидными
 T=$(page_token "$BASE/admin/game-settings.php?id=$GAME_ID&tab=controls")
 RES=$(curl -s -o /dev/null -w '%{http_code}' -b "$CJ" -c "$CJ" \
   --data-urlencode "action=save-controls" --data-urlencode "game_id=$GAME_ID" --data-urlencode "tab=controls" \
-  --data-urlencode "controls[left][]=ArrowLeft" --data-urlencode "controls[right][]=ArrowRight" \
-  --data-urlencode "controls[up][]=ArrowUp" --data-urlencode "controls[down][]=ArrowDown" \
-  --data-urlencode "controls[dig_left][]=KeyA" --data-urlencode "controls[dig_right][]=KeyD" \
-  --data-urlencode "controls[pause][]=KeyP" --data-urlencode "controls[start][]=Enter" \
   --data-urlencode "controls[fire][]=Space" \
-  --data-urlencode "_csrf=$T" "$BASE/admin/game-settings.php")
+  --data-urlencode "_csrf=$T" "$BASE/admin/game-settings.php?id=$GAME_ID")
 check "POST save-controls (fire=Space) -> 302" 302 "$RES"
+FIREKEY=$(php -r "(\$g=json_decode(file_get_contents(\"data/games/$GAME_ID.json\"),true)); echo implode(',', \$g['controls']['fire'] ?? []);")
+check "controls.fire = Space записан" "Space" "$FIREKEY"
 T=$(page_token "$BASE/admin/game-combat.php?id=$GAME_ID&tab=attacks")
 RES=$(curl -s -o /dev/null -w '%{http_code}' -b "$CJ" -c "$CJ" \
   --data-urlencode "action=save-attacks" --data-urlencode "game_id=$GAME_ID" --data-urlencode "tab=attacks" \
