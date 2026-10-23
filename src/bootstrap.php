@@ -13,17 +13,7 @@ use App\Storage\FileStore;
 /**
  * Сборка сервисов приложения (простая фабрика без DI-контейнера).
  *
- * @return array{
- *   config: array<string,mixed>,
- *   store: FileStore,
- *   audit: Logger,
- *   throttle: Throttle,
- *   auth: Authenticator,
- *   limiter: Limiter,
- *   genres: GenreService,
- *   categories: CategoryService,
- *   references: ReferenceImporter
- * }
+ * @return array<string,mixed>
  */
 function services(?string $root = null): array
 {
@@ -44,6 +34,11 @@ function services(?string $root = null): array
     $emojiBank = new \App\Emoji\EmojiBankService($store, $audit, $config['media_dir']);
     $aiModels = new \App\Library\LibraryService($store, $audit, \App\Library\LibraryService::KIND_AI);
     $patterns = new \App\Library\LibraryService($store, $audit, \App\Library\LibraryService::KIND_PATTERN);
+    $legendValidator = new \App\Validation\LegendValidator($aiModels, $patterns);
+    $gameValidator = new \App\Validation\GameValidator($genres, $categories, $legendValidator, $store, $config['media_dir']);
+    $games = new GameService($store, $audit, $genres, $gameValidator, $config['media_dir']);
+    $levels = new LevelService($store, $audit, $games, $genres, $legendValidator);
+    $settings = new \App\Settings\SettingsService($store, $audit, $genres, $games);
 
-    return compact('config', 'store', 'audit', 'throttle', 'auth', 'limiter', 'genres', 'categories', 'references', 'emojiBank', 'aiModels', 'patterns');
+    return compact('config', 'store', 'audit', 'throttle', 'auth', 'limiter', 'genres', 'categories', 'references', 'emojiBank', 'aiModels', 'patterns', 'legendValidator', 'gameValidator', 'games', 'levels', 'settings');
 }

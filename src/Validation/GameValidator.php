@@ -121,6 +121,41 @@ final class GameValidator
                     $errors[] = sprintf('Публикация невозможна: действие «%s» не назначено ни на одну клавишу.', $act);
                 }
             }
+
+            // Согласованность controls/sounds/engine_overrides (ТЗ блок 9 §7.4)
+            $overrides = \App\Settings\SettingsService::toArray($game['engine_overrides'] ?? []);
+            $legendEff = array_merge((array)($genre['default_legend'] ?? []), $legend);
+            if ($engine === 'static-screen') {
+                $diggable = false;
+                foreach ($legendEff as $el) {
+                    if (is_array($el) && ($el['role'] ?? '') === 'obstacle' && ($el['diggable'] ?? false) === true) {
+                        $diggable = true;
+                        break;
+                    }
+                }
+                if ($diggable) {
+                    foreach (['dig_left', 'dig_right'] as $act) {
+                        if ((array)($controls[$act] ?? []) === []) {
+                            $errors[] = sprintf('Публикация невозможна: в легенде есть diggable, но действие «%s» не назначено.', $act);
+                        }
+                    }
+                }
+            }
+            $jumpPower = $overrides['physics']['jump_power'] ?? 0.0;
+            if (($engine === 'horizontal-scroll') && is_numeric($jumpPower) && (float)$jumpPower < 0) {
+                if ((array)($controls['jump'] ?? []) === []) {
+                    $errors[] = 'Публикация невозможна: jump_power < 0, но действие «jump» не назначено.';
+                }
+            }
+            foreach (SettingsValidator::validateControls($controls, $required) as $e) {
+                $errors[] = 'Управление: ' . $e;
+            }
+            foreach (SettingsValidator::validateSounds($game['sounds'] ?? []) as $e) {
+                $errors[] = 'Звуки: ' . $e;
+            }
+            foreach (SettingsValidator::validateOverrides($overrides, $engine) as $e) {
+                $errors[] = 'Настройки: ' . $e;
+            }
         }
 
         return $errors;
