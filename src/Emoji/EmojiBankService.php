@@ -122,10 +122,10 @@ final class EmojiBankService
                 throw new UploadException('Не осталось свободных PUA-кодпоинтов. Лимит — 6400.');
             }
             $idNum = $next + 1;
-            $num = str_pad((string)$idNum, 3, '0', STR_PAD_LEFT);
+            $num = 'e' . str_pad((string)$idNum, 3, '0', STR_PAD_LEFT);
             $c = ['next' => $idNum];
             return [
-                'id' => 'e' . $num,
+                'id' => $num,
                 'codepoint' => sprintf('U+%04X', self::PUA_START + ($idNum - 1)),
                 'file' => self::MEDIA_DIR . '/' . $num . '.' . $format,
             ];
@@ -166,10 +166,10 @@ final class EmojiBankService
                 throw new UploadException('Не удалось записать файл эмодзи');
             }
             $fileWritten = true;
-            $this->store->mutate(self::BANK_FILE, static function (mixed $rows) use ($record): array {
+            $this->store->mutate(self::BANK_FILE, static function (mixed &$rows) use ($record): bool {
                 $rows = is_array($rows) ? $rows : [];
                 $rows[] = $record;
-                return $rows;
+                return true;
             });
         } catch (\Throwable $e) {
             if ($fileWritten) {
@@ -203,7 +203,7 @@ final class EmojiBankService
             throw new UploadException('Не удалось записать файл эмодзи');
         }
         $result = $row;
-        $this->store->mutate(self::BANK_FILE, static function (mixed $rows) use ($id, $format, $sourceSize, $isGifSource, $sanitizedHash, &$result): array {
+        $this->store->mutate(self::BANK_FILE, static function (mixed &$rows) use ($id, $format, $sourceSize, $isGifSource, $sanitizedHash, &$result): bool {
             $rows = is_array($rows) ? $rows : [];
             foreach ($rows as &$r) {
                 if (($r['id'] ?? '') === $id) {
@@ -215,7 +215,8 @@ final class EmojiBankService
                     $result = $r;
                 }
             }
-            return $rows;
+            unset($r);
+            return true;
         });
         $this->audit->log('emoji_bank.update', $id, ['changed' => ['image']], $this->user);
         return $result;
@@ -233,7 +234,7 @@ final class EmojiBankService
             return $errors;
         }
         $found = false;
-        $this->store->mutate(self::BANK_FILE, static function (mixed $rows) use ($id, $name, $category, &$found): array {
+        $this->store->mutate(self::BANK_FILE, static function (mixed &$rows) use ($id, $name, $category, &$found): bool {
             $rows = is_array($rows) ? $rows : [];
             foreach ($rows as &$r) {
                 if (($r['id'] ?? '') === $id) {
@@ -243,7 +244,8 @@ final class EmojiBankService
                     $found = true;
                 }
             }
-            return $rows;
+            unset($r);
+            return true;
         });
         if (!$found) {
             return ['Эмодзи не найден.'];
@@ -288,10 +290,10 @@ final class EmojiBankService
             'updated_at' => $now,
         ];
 
-        $this->store->mutate(self::BANK_FILE, static function (mixed $rows) use ($record): array {
+        $this->store->mutate(self::BANK_FILE, static function (mixed &$rows) use ($record): bool {
             $rows = is_array($rows) ? $rows : [];
             $rows[] = $record;
-            return $rows;
+            return true;
         });
         $this->bumpCounterTo((int)substr($record['id'], 1));
 
@@ -329,7 +331,7 @@ final class EmojiBankService
             return $errors;
         }
         $changed = [];
-        $this->store->mutate(self::BANK_FILE, static function (mixed $rows) use ($id, $frames, $loopMode, &$changed): array {
+        $this->store->mutate(self::BANK_FILE, static function (mixed &$rows) use ($id, $frames, $loopMode, &$changed): bool {
             $rows = is_array($rows) ? $rows : [];
             foreach ($rows as &$r) {
                 if (($r['id'] ?? '') === $id) {
@@ -347,7 +349,8 @@ final class EmojiBankService
                     $r['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
                 }
             }
-            return $rows;
+            unset($r);
+            return true;
         });
         $this->audit->log('emoji_bank.animation_update', $id, ['changed' => $changed], $this->user);
         return [];
@@ -383,9 +386,10 @@ final class EmojiBankService
             return $msgs !== [] ? $msgs : ['Эмодзи используется.'];
         }
 
-        $this->store->mutate(self::BANK_FILE, static function (mixed $rows) use ($id): array {
+        $this->store->mutate(self::BANK_FILE, static function (mixed &$rows) use ($id): bool {
             $rows = is_array($rows) ? $rows : [];
-            return array_values(array_filter($rows, static fn(array $r): bool => ($r['id'] ?? '') !== $id));
+            $rows = array_values(array_filter($rows, static fn(array $r): bool => ($r['id'] ?? '') !== $id));
+            return true;
         });
         // Файл удаляем после JSON; кодпоинт НЕ переиспользуется — счётчик не трогаем.
         if (is_string($row['image_path'] ?? null)) {
@@ -742,13 +746,13 @@ final class EmojiBankService
                 $newRecords[] = $record;
             }
             $maxIdNum = $this->counterNext();
-            $this->store->mutate(self::BANK_FILE, static function (mixed $rows) use ($newRecords, &$maxIdNum): array {
+            $this->store->mutate(self::BANK_FILE, static function (mixed &$rows) use ($newRecords, &$maxIdNum): bool {
                 $rows = is_array($rows) ? $rows : [];
                 foreach ($newRecords as $rec) {
                     $rows[] = $rec;
                     $maxIdNum = max($maxIdNum, (int)substr((string)$rec['id'], 1));
                 }
-                return $rows;
+                return true;
             });
             // Счётчик импорта: next = max(id_num всех записей) (ТЗ §6.5).
             $this->store->write(self::COUNTER_FILE, ['next' => $maxIdNum]);

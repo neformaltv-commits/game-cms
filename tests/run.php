@@ -60,7 +60,9 @@ foreach (array_diff($after, $before) as $class) {
             );
             echo 'F';
         } finally {
-            $instance->tearDown();
+            if ($ref->hasMethod('tearDown')) {
+                $instance->tearDown();
+            }
         }
     }
 }
