@@ -28,3 +28,20 @@ button, .btn { background: #0b5ed7; color: #fff; border: 0; padding: .45rem .9re
 .login-card label { display: block; margin: .6rem 0; }
 .login-card input { width: 100%; padding: .45rem; margin-top: .2rem; }
 .login-card button { width: 100%; margin-top: .8rem; }
+
+/* Этап 4: редактор сетки */
+.palette { display: flex; flex-wrap: wrap; gap: .3rem; margin: .5rem 0; }
+.swatch { background: #fff; color: #222; border: 1px solid #d8dde5; border-radius: 4px; padding: .3rem .5rem; font-size: 1.1rem; }
+.swatch.active { outline: 3px solid #0b5ed7; }
+.swatch small { font-size: .7rem; color: #555; }
+.grid-editor { border-collapse: collapse; table-layout: fixed; }
+.grid-editor td { width: 22px; height: 22px; border: 1px solid #e3e6ea; text-align: center; font-size: 14px; cursor: pointer; background: #fbfcfe; padding: 0; }
+.grid-editor td:hover { outline: 2px solid #0b5ed7; }
+.level-tabs { list-style: none; display: flex; flex-wrap: wrap; gap: .6rem; padding: 0; }
+.level-tabs a.active { font-weight: 700; text-decoration: underline; }
+.badge { padding: .1rem .5rem; border-radius: 8px; font-size: .8rem; background: #e9ecef; }
+.badge-published { background: #d1e7dd; color: #0f5132; }
+.badge-draft { background: #fff3cd; color: #664d03; }
+.badge-archived { background: #e2e3e5; color: #41464b; }
+.hint { color: #6c757d; font-size: .85rem; }
+#grid-input { font-family: monospace; white-space: pre; }

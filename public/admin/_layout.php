@@ -36,6 +36,7 @@ function admin_header(string $title, string $active = ''): void
     <nav>
         <a href="/admin/index.php" class="<?= $active === 'dashboard' ? 'active' : '' ?>">Обзор</a>
         <a href="/admin/genres.php" class="<?= $active === 'genres' ? 'active' : '' ?>">Жанры</a>
+        <a href="/admin/games.php" class="<?= $active === 'games' ? 'active' : '' ?>">Игры</a>
         <a href="/admin/categories.php" class="<?= $active === 'categories' ? 'active' : '' ?>">Категории</a>
         <a href="/admin/references.php" class="<?= $active === 'references' ? 'active' : '' ?>">Референсы</a>
         <a href="/admin/ai-models.php" class="<?= $active === 'ai-models' ? 'active' : '' ?>">AI-модели</a>
