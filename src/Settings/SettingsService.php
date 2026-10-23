@@ -118,7 +118,7 @@ final class SettingsService
 
         $errors = SettingsValidator::validateControls($controls, $actions['required']);
         if ($errors !== []) {
-            return $errors; // данные не изменяются при ошибке валидации (§7.2)
+            return ['ok' => false, 'errors' => $errors]; // данные не изменяются при ошибке (§7.2)
         }
 
         $this->mutate($gameId, static function (array &$game) use ($controls): void {
@@ -129,7 +129,7 @@ final class SettingsService
             'changed_actions' => $changedActions,
             'added_keys' => $addedKeys,
         ]);
-        return [];
+        return ['ok' => true, 'errors' => []];
     }
 
     /** Сброс controls к genre.default_controls (§3.4). @return list<string> */
@@ -145,7 +145,7 @@ final class SettingsService
             $game['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
         });
         $this->audit->log('game.settings_reset', $gameId, ['reset' => ['controls'], 'from' => 'genre']);
-        return [];
+        return ['ok' => true, 'errors' => []];
     }
 
     /**
@@ -162,9 +162,11 @@ final class SettingsService
         if (isset($input['sounds_json']) && is_string($input['sounds_json'])) {
             $decoded = json_decode($input['sounds_json'], true);
             if (!is_array($decoded)) {
-                return ['sounds: повреждённые данные формы.'];
+                return ['ok' => false, 'errors' => ['sounds: повреждённые данные формы.']];
             }
             $sounds = $decoded;
+        } elseif (isset($input['sounds']) && is_array($input['sounds'])) {
+            $sounds = $input['sounds'];
         } else {
             $events = (array)($input['s_event'] ?? []);
             $sounds = [];
@@ -183,7 +185,7 @@ final class SettingsService
 
         $errors = SettingsValidator::validateSounds($sounds);
         if ($errors !== []) {
-            return $errors;
+            return ['ok' => false, 'errors' => $errors];
         }
 
         $oldEvents = array_column(array_map(static fn ($s) => (array)$s, (array)($ctx['game']['sounds'] ?? [])), 'event');
@@ -198,7 +200,7 @@ final class SettingsService
             $game['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
         });
         $this->audit->log('game.sounds_update', $gameId, ['changed_events' => $changedEvents]);
-        return [];
+        return ['ok' => true, 'errors' => []];
     }
 
     /** Сброс sounds к genre.default_sounds (§5.6). @return list<string> */
@@ -214,7 +216,7 @@ final class SettingsService
             $game['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
         });
         $this->audit->log('game.settings_reset', $gameId, ['reset' => ['sounds'], 'from' => 'genre']);
-        return [];
+        return ['ok' => true, 'errors' => []];
     }
 
     /**
@@ -229,10 +231,12 @@ final class SettingsService
             return ['Игра не найдена.'];
         }
         $engine = (string)($ctx['genre']['engine'] ?? '');
-        $overrides = self::normalize($input);
+        $source = isset($input['engine_overrides']) && is_array($input['engine_overrides'])
+            ? $input['engine_overrides'] : $input;
+        $overrides = self::normalize($source);
         $errors = SettingsValidator::validateOverrides($overrides, $engine);
         if ($errors !== []) {
-            return $errors;
+            return ['ok' => false, 'errors' => $errors];
         }
 
         $old = self::toArray($ctx['game']['engine_overrides'] ?? []);
@@ -243,21 +247,21 @@ final class SettingsService
             $game['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
         });
         $this->audit->log('game.engine_overrides_update', $gameId, ['changed' => $changed]);
-        return [];
+        return ['ok' => true, 'errors' => []];
     }
 
     /** Сброс engine_overrides к дефолтам жанра = пустой объект (§4.4). */
     public function resetOverridesToGenre(string $gameId): array
     {
         if ($this->context($gameId) === null) {
-            return ['Игра не найдена.'];
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
         }
         $this->mutate($gameId, static function (array &$game): void {
             $game['engine_overrides'] = new \stdClass();
             $game['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
         });
         $this->audit->log('game.settings_reset', $gameId, ['reset' => ['engine_overrides'], 'from' => 'genre']);
-        return [];
+        return ['ok' => true, 'errors' => []];
     }
 
     /**
@@ -270,20 +274,20 @@ final class SettingsService
         $ctx = $this->context($gameId);
         $src = $this->context($sourceId);
         if ($ctx === null) {
-            return ['Игра не найдена.'];
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
         }
         if ($src === null || $sourceId === $gameId) {
-            return ['Источник не найден.'];
+            return ['ok' => false, 'errors' => ['Источник не найден.']];
         }
         $e1 = (string)($ctx['genre']['engine'] ?? '');
         $e2 = (string)($src['genre']['engine'] ?? '');
         if ($e1 !== $e2) {
-            return ['Источник должен быть того же движка.'];
+            return ['ok' => false, 'errors' => ['Источник должен быть того же движка.']];
         }
         $allowed = ['controls', 'sounds', 'engine_overrides'];
         $fields = array_values(array_intersect($fields, $allowed));
         if ($fields === []) {
-            return ['Не выбрано ни одного поля для копирования.'];
+            return ['ok' => false, 'errors' => ['Не выбрано ни одного поля для копирования.']];
         }
         $this->mutate($gameId, static function (array &$game) use ($src, $fields): void {
             foreach ($fields as $f) {
@@ -297,7 +301,7 @@ final class SettingsService
             $game['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
         });
         $this->audit->log('game.settings_copy', $gameId, ['source' => $sourceId, 'fields' => $fields]);
-        return [];
+        return ['ok' => true, 'errors' => []];
     }
 
     /**

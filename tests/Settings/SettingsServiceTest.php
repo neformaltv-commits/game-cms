@@ -61,8 +61,9 @@ final class SettingsServiceTest extends TestCase
     public function testSaveControlsHappyPath(): void
     {
         $game = $this->makeGame('ctl-ok');
-        $errors = $this->svc->saveControls($game['id'], ['left' => 'ArrowLeft,KeyA', 'dig_left' => ['KeyQ']]);
-        $this->assertSame([], $errors);
+        $res = $this->svc->saveControls($game['id'], ['left' => 'ArrowLeft,KeyA', 'dig_left' => ['KeyQ']]);
+        $this->assertTrue($res['ok']);
+        $this->assertSame([], $res['errors']);
         $fresh = $this->games->find($game['id']);
         $this->assertSame(['ArrowLeft', 'KeyA'], $fresh['controls']['left']);
         $this->assertSame(['KeyQ'], $fresh['controls']['dig_left']);
@@ -72,12 +73,12 @@ final class SettingsServiceTest extends TestCase
     public function testSaveControlsRejectsEmptyRequiredAndBadCode(): void
     {
         $game = $this->makeGame('ctl-bad');
-        $errors = $this->svc->saveControls($game['id'], ['left' => '']);
-        $this->assertTrue($errors !== []); // обязательное действие без клавиши
-        $errors = $this->svc->saveControls($game['id'], ['left' => '<img src=x>']);
-        $this->assertTrue($errors !== []); // невалидный KeyboardEvent.code
-        $errors = $this->svc->saveControls($game['id'], ['left' => 'KeyA,KeyB,KeyC']);
-        $this->assertTrue($errors !== []); // >2 клавиш
+        $res = $this->svc->saveControls($game['id'], ['left' => '']);
+        $this->assertFalse($res['ok']); // обязательное действие без клавиши
+        $res = $this->svc->saveControls($game['id'], ['left' => '<img src=x>']);
+        $this->assertFalse($res['ok']); // невалидный KeyboardEvent.code
+        $res = $this->svc->saveControls($game['id'], ['left' => 'KeyA,KeyB,KeyC']);
+        $this->assertFalse($res['ok']); // >2 клавиш
         // данные не изменились после ошибок (остались дефолты жанра)
         $fresh = $this->games->find($game['id']);
         $this->assertSame(['ArrowLeft', 'KeyA'], $fresh['controls']['left']);
@@ -105,7 +106,7 @@ final class SettingsServiceTest extends TestCase
     {
         $game = $this->makeGame('ctl-reset');
         $this->svc->saveControls($game['id'], ['left' => 'KeyH']);
-        $this->assertSame([], $this->svc->resetControls($game['id']));
+        $this->assertTrue($this->svc->resetControls($game['id'])['ok']);
         $fresh = $this->games->find($game['id']);
         $this->assertSame(['ArrowLeft', 'KeyA'], $fresh['controls']['left']);
         $this->assertContains('"action":"game.settings_reset"', $this->auditLines());
@@ -118,26 +119,26 @@ final class SettingsServiceTest extends TestCase
             ['event' => 'dig', 'wave' => 'square', 'frequency_hz' => 440, 'frequency_end_hz' => null, 'duration_ms' => 50, 'volume' => 0.03, 'envelope' => 'decay'],
             ['event' => 'win', 'wave' => 'triangle', 'frequency_hz' => 1760, 'frequency_end_hz' => null, 'duration_ms' => 250, 'volume' => 0.05, 'envelope' => 'pluck'],
         ]);
-        $this->assertSame([], $this->svc->saveSounds($game['id'], ['sounds_json' => $json]));
+        $this->assertTrue($this->svc->saveSounds($game['id'], ['sounds_json' => $json])['ok']);
         $fresh = $this->games->find($game['id']);
         $this->assertCount(2, $fresh['sounds']);
         // частота вне диапазона
         $bad = json_encode([['event' => 'hit', 'wave' => 'square', 'frequency_hz' => 5000, 'duration_ms' => 50, 'volume' => 0.1, 'envelope' => 'decay']]);
-        $this->assertTrue($this->svc->saveSounds($game['id'], ['sounds_json' => $bad]) !== []);
+        $this->assertFalse($this->svc->saveSounds($game['id'], ['sounds_json' => $bad])['ok']);
         // XSS в event отклоняется enum-валидацией
         $xss = json_encode([['event' => '<script>', 'wave' => 'square', 'frequency_hz' => 100, 'duration_ms' => 50, 'volume' => 0.1, 'envelope' => 'decay']]);
-        $this->assertTrue($this->svc->saveSounds($game['id'], ['sounds_json' => $xss]) !== []);
+        $this->assertFalse($this->svc->saveSounds($game['id'], ['sounds_json' => $xss])['ok']);
         $this->assertContains('game.sounds_update', $this->auditLines());
     }
 
     public function testSaveOverridesWhitelistAndErrors(): void
     {
         $game = $this->makeGame('ovr-ok');
-        $errors = $this->svc->saveOverrides($game['id'], [
+        $res = $this->svc->saveOverrides($game['id'], [
             'speed_scale' => '1.1', 'fps' => '30', 'sprite_flicker' => '1',
             'evil_field' => '999', 'physics' => ['gravity' => '0.5'],
         ]);
-        $this->assertSame([], $errors);
+        $this->assertTrue($res['ok']);
         $raw = json_decode((string)file_get_contents($this->dir . '/games/' . $game['id'] . '.json'), true);
         $this->assertSame(1.1, $raw['engine_overrides']['speed_scale']);
         $this->assertSame(30, $raw['engine_overrides']['fps']);
@@ -145,9 +146,9 @@ final class SettingsServiceTest extends TestCase
         $this->assertSame(0.5, $raw['engine_overrides']['physics']['gravity']);
         $this->assertFalse(isset($raw['engine_overrides']['evil_field'])); // white-list (§8)
         // вне диапазона
-        $this->assertTrue($this->svc->saveOverrides($game['id'], ['speed_scale' => '3.0']) !== []);
+        $this->assertFalse($this->svc->saveOverrides($game['id'], ['speed_scale' => '3.0'])['ok']);
         // movement_type × view_mode
-        $this->assertTrue($this->svc->saveOverrides($game['id'], ['movement_type' => 'top_down_8dir', 'view_mode' => 'side']) !== []);
+        $this->assertFalse($this->svc->saveOverrides($game['id'], ['movement_type' => 'top_down_8dir', 'view_mode' => 'side'])['ok']);
         $this->assertContains('game.engine_overrides_update', $this->auditLines());
     }
 
@@ -155,7 +156,7 @@ final class SettingsServiceTest extends TestCase
     {
         $game = $this->makeGame('ovr-reset');
         $this->svc->saveOverrides($game['id'], ['speed_scale' => '1.5']);
-        $this->assertSame([], $this->svc->resetOverridesToGenre($game['id']));
+        $this->assertTrue($this->svc->resetOverridesToGenre($game['id'])['ok']);
         $raw = json_decode((string)file_get_contents($this->dir . '/games/' . $game['id'] . '.json'), true);
         $this->assertSame([], $raw['engine_overrides']); // {} в JSON → [] при decode assoc
         $this->assertContains('"reset":["engine_overrides"]', $this->auditLines());
@@ -170,11 +171,11 @@ final class SettingsServiceTest extends TestCase
         // другой движок — ошибка
         $other = $this->games->create(['title' => 'Рейд', 'description' => str_repeat('р', 30), 'genre_id' => 'genre-riverraid', 'category_ids' => [], 'status' => 'draft', 'slug' => 'cp-other-engine']);
         assert($other['ok']);
-        $errs = $this->svc->copyFrom($g1['id'], $other['game']['id'], ['controls']);
-        $this->assertSame(['Источник должен быть того же движка.'], $errs);
+        $res = $this->svc->copyFrom($g1['id'], $other['game']['id'], ['controls']);
+        $this->assertSame(['Источник должен быть того же движка.'], $res['errors']);
         // тот же движок
-        $errs = $this->svc->copyFrom($g1['id'], $g2['id'], ['engine_overrides', 'nonsense']);
-        $this->assertSame([], $errs);
+        $res = $this->svc->copyFrom($g1['id'], $g2['id'], ['engine_overrides', 'nonsense']);
+        $this->assertTrue($res['ok']);
         $fresh = $this->games->find($g1['id']);
         $ovr = SettingsService::toArray($fresh['engine_overrides']);
         $this->assertSame(1.8, $ovr['speed_scale']);
