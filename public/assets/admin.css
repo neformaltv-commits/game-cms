@@ -1,0 +1,30 @@
+/* Mini CMS — админка (этап 1: минимальная базовая типографика и формы) */
+* { box-sizing: border-box; }
+body { font-family: system-ui, sans-serif; margin: 0; color: #222; background: #f6f7f9; }
+a { color: #0b5ed7; }
+.topbar { display: flex; align-items: center; gap: 1rem; background: #1e2430; color: #fff; padding: .6rem 1rem; }
+.topbar a { color: #cfd6e4; text-decoration: none; margin-right: .6rem; }
+.topbar a.active { color: #fff; font-weight: 600; }
+.brand { font-weight: 700; letter-spacing: .06em; }
+.logout-form { margin-left: auto; display: flex; align-items: center; gap: .5rem; }
+.content { max-width: 960px; margin: 1.5rem auto; padding: 0 1rem; }
+h1 { font-size: 1.5rem; }
+.table { border-collapse: collapse; width: 100%; background: #fff; }
+.table th, .table td { border: 1px solid #d8dde5; padding: .45rem .6rem; text-align: left; font-size: .92rem; }
+.form label { display: block; margin: .6rem 0; }
+.form input[type=text], .form input[type=password], .form input[type=number],
+.form textarea, .form select, .form input[type=file] { display: block; width: 100%; max-width: 32rem; padding: .4rem; margin-top: .2rem; }
+button, .btn { background: #0b5ed7; color: #fff; border: 0; padding: .45rem .9rem; cursor: pointer; text-decoration: none; display: inline-block; }
+.link-btn { background: none; border: 0; color: #0b5ed7; padding: 0; cursor: pointer; }
+.link-btn.danger { color: #b02a37; }
+.flash { padding: .5rem .8rem; border-radius: 4px; }
+.flash-success { background: #d1e7dd; color: #0f5132; }
+.flash-error { background: #f8d7da; color: #842029; }
+.cards { display: flex; gap: 1rem; }
+.card { background: #fff; border: 1px solid #d8dde5; border-radius: 6px; padding: 1rem 1.5rem; }
+.card .num { font-size: 1.8rem; font-weight: 700; }
+.login-page { display: grid; place-items: center; min-height: 100vh; }
+.login-card { background: #fff; border: 1px solid #d8dde5; border-radius: 8px; padding: 2rem; width: 22rem; }
+.login-card label { display: block; margin: .6rem 0; }
+.login-card input { width: 100%; padding: .45rem; margin-top: .2rem; }
+.login-card button { width: 100%; margin-top: .8rem; }

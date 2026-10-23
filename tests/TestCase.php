@@ -46,6 +46,22 @@ abstract class TestCase
         $this->assertSame($expected, count($c), $message ?: 'wrong count');
     }
 
+    protected function assertNotNull(mixed $v, string $message = 'expected not null'): void
+    {
+        if ($v === null) {
+            throw new RuntimeException($message);
+        }
+    }
+
+    /** @param array<array-key,mixed>|string $haystack */
+    protected function assertContains(mixed $needle, array|string $haystack, string $message = ''): void
+    {
+        $found = is_array($haystack) ? in_array($needle, $haystack, true) : str_contains((string)$haystack, (string)$needle);
+        if (!$found) {
+            throw new RuntimeException(($message ?: 'value not contained') . ': ' . var_export($needle, true));
+        }
+    }
+
     /** Ожидаемое исключение. */
     protected function assertThrows(string $class, callable $fn, string $message = ''): void
     {
