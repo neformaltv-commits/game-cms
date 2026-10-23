@@ -66,7 +66,7 @@ final class SettingsServiceTest extends TestCase
         $fresh = $this->games->find($game['id']);
         $this->assertSame(['ArrowLeft', 'KeyA'], $fresh['controls']['left']);
         $this->assertSame(['KeyQ'], $fresh['controls']['dig_left']);
-        $this->assertStrContains($this->auditLines(), 'game.controls_update');
+        $this->assertContains('game.controls_update', $this->auditLines());
     }
 
     public function testSaveControlsRejectsEmptyRequiredAndBadCode(): void
@@ -78,14 +78,17 @@ final class SettingsServiceTest extends TestCase
         $this->assertTrue($errors !== []); // невалидный KeyboardEvent.code
         $errors = $this->svc->saveControls($game['id'], ['left' => 'KeyA,KeyB,KeyC']);
         $this->assertTrue($errors !== []); // >2 клавиш
-        // данные не изменились после ошибок
+        // данные не изменились после ошибок (остались дефолты жанра)
         $fresh = $this->games->find($game['id']);
-        $this->assertSame(['ArrowLeft'], $fresh['controls']['left']);
+        $this->assertSame(['ArrowLeft', 'KeyA'], $fresh['controls']['left']);
     }
 
     public function testActiveActionsPerEngine(): void
     {
-        $legend = ['🧱' => ['role' => 'obstacle', 'diggable' => true]];
+        // effectiveLegend игры: default_legend жанра + legend игры (ТЗ блок 7 §5)
+        $game = $this->makeGame('act-eng');
+        $legend = $this->games->effectiveLegend($game);
+        $this->assertTrue(in_array('obstacle', array_values(array_column($legend, 'role')), true));
         $a = $this->svc->activeActions('static-screen', $legend, []);
         $this->assertSame(['left', 'right', 'up', 'down', 'pause', 'start'], $a['required']);
         $this->assertTrue(in_array('dig_left', $a['optional'], true));
@@ -105,7 +108,7 @@ final class SettingsServiceTest extends TestCase
         $this->assertSame([], $this->svc->resetControls($game['id']));
         $fresh = $this->games->find($game['id']);
         $this->assertSame(['ArrowLeft', 'KeyA'], $fresh['controls']['left']);
-        $this->assertStrContains($this->auditLines(), '"action":"game.settings_reset"');
+        $this->assertContains('"action":"game.settings_reset"', $this->auditLines());
     }
 
     public function testSaveSoundsAndValidation(): void
@@ -124,7 +127,7 @@ final class SettingsServiceTest extends TestCase
         // XSS в event отклоняется enum-валидацией
         $xss = json_encode([['event' => '<script>', 'wave' => 'square', 'frequency_hz' => 100, 'duration_ms' => 50, 'volume' => 0.1, 'envelope' => 'decay']]);
         $this->assertTrue($this->svc->saveSounds($game['id'], ['sounds_json' => $xss]) !== []);
-        $this->assertStrContains($this->auditLines(), 'game.sounds_update');
+        $this->assertContains('game.sounds_update', $this->auditLines());
     }
 
     public function testSaveOverridesWhitelistAndErrors(): void
@@ -145,7 +148,7 @@ final class SettingsServiceTest extends TestCase
         $this->assertTrue($this->svc->saveOverrides($game['id'], ['speed_scale' => '3.0']) !== []);
         // movement_type × view_mode
         $this->assertTrue($this->svc->saveOverrides($game['id'], ['movement_type' => 'top_down_8dir', 'view_mode' => 'side']) !== []);
-        $this->assertStrContains($this->auditLines(), 'game.engine_overrides_update');
+        $this->assertContains('game.engine_overrides_update', $this->auditLines());
     }
 
     public function testResetOverridesEmptiesObject(): void
@@ -155,7 +158,7 @@ final class SettingsServiceTest extends TestCase
         $this->assertSame([], $this->svc->resetOverridesToGenre($game['id']));
         $raw = json_decode((string)file_get_contents($this->dir . '/games/' . $game['id'] . '.json'), true);
         $this->assertSame([], $raw['engine_overrides']); // {} в JSON → [] при decode assoc
-        $this->assertStrContains($this->auditLines(), '"reset":["engine_overrides"]');
+        $this->assertContains('"reset":["engine_overrides"]', $this->auditLines());
     }
 
     public function testCopyFromSameEngineOnly(): void
@@ -175,7 +178,7 @@ final class SettingsServiceTest extends TestCase
         $fresh = $this->games->find($g1['id']);
         $ovr = SettingsService::toArray($fresh['engine_overrides']);
         $this->assertSame(1.8, $ovr['speed_scale']);
-        $this->assertStrContains($this->auditLines(), '"action":"game.settings_copy"');
+        $this->assertContains('"action":"game.settings_copy"', $this->auditLines());
     }
 
     public function testPublishRequiresDigKeys(): void
@@ -190,6 +193,6 @@ final class SettingsServiceTest extends TestCase
 
     private function auditLines(): string
     {
-        return (string)@file_get_contents($this->dir . '/logs/audit.log');
+        return (string)@file_get_contents($this->dir . '/audit.log');
     }
 }

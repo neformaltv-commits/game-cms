@@ -46,9 +46,9 @@ final class LevelService
     public function create(string $gameId): array
     {
         $result = ['ok' => false, 'errors' => [], 'level' => null];
-        $this->mutateLevels($gameId, function (array &$levels, array $game) use (&$result): bool {
+        $this->mutateLevels($gameId, function (array &$levels, array $game) use (&$result): array {
             $genre = $this->genres->find((string)$game['genre_id']);
-            $fill = $this->backgroundFill($genre);
+            $fill = $this->backgroundFill($genre, $game);
             $n = count($levels) + 1;
             $level = [
                 'id' => $this->nextLevelId($levels),
@@ -61,9 +61,15 @@ final class LevelService
                 'time_limit_s' => null,
                 'created_at' => gmdate('Y-m-d\TH:i:s\Z'),
             ];
+            // Пустые клетки («.») не входят в легенду — добавляем их как background-элемент
+            // самой игры (ТЗ §3.1: legend игры переопределяет/дополняет легенду жанра).
+            $legendPatch = [];
+            if ($fill === '.' && !array_key_exists('.', (array)$game['legend'])) {
+                $legendPatch['.'] = ['role' => 'background', 'name' => 'Пусто'];
+            }
             $levels[] = $level;
             $result = ['ok' => true, 'errors' => [], 'level' => $level];
-            return true;
+            return ['ok' => true, 'legend_patch' => $legendPatch];
         });
         if ($result['ok']) {
             $this->audit->log('level.create', $gameId, ['level_id' => $result['level']['id']]);
@@ -335,13 +341,21 @@ final class LevelService
     }
 
     /** Фоновый emoji для заполнения: первый background из default_legend жанра, иначе '.' */
-    private function backgroundFill(?array $genre): string
+    private function backgroundFill(?array $genre, array $game = []): string
     {
+        // 1) фон уже задан в легенде самой игры — берём первый background-элемент;
+        foreach ((array)($game['legend'] ?? []) as $emoji => $el) {
+            if (is_array($el) && ($el['role'] ?? '') === 'background') {
+                return (string)$emoji;
+            }
+        }
+        // 2) иначе — первый background из легенды жанра;
         foreach ((array)($genre['default_legend'] ?? []) as $emoji => $el) {
             if (is_array($el) && ($el['role'] ?? '') === 'background') {
                 return (string)$emoji;
             }
         }
+        // 3) фона нет нигде — пустая клетка «.».
         return '.';
     }
 
@@ -363,15 +377,27 @@ final class LevelService
      */
     private function mutateLevels(string $gameId, callable $fn): void
     {
-        $this->store->mutate('games/' . $gameId . '.json', static function (mixed &$game) use ($fn): mixed {
+        $this->store->mutate('games/' . $gameId . '.json', function (mixed &$game) use ($fn): mixed {
             if (!is_array($game)) {
                 return false;
             }
             $levels = array_values((array)($game['levels'] ?? []));
-            if ($fn($levels, $game) === false) {
+            // Мутатор может вернуть bool или ['ok' => bool, 'legend_patch' => ?array] —
+            // levels изменяются только при ok=true, legend_patch применяется к игре.
+            $patchLegend = null;
+            $res = $fn($levels, $game);
+            if (is_array($res)) {
+                if (($res['ok'] ?? false) !== true) {
+                    return false;
+                }
+                $patchLegend = $res['legend_patch'] ?? null;
+            } elseif ($res === false) {
                 return false;
             }
             $game['levels'] = $levels;
+            if (is_array($patchLegend) && $patchLegend !== []) {
+                $game['legend'] = array_merge((array)($game['legend'] ?? []), $patchLegend);
+            }
             $game['updated_at'] = gmdate('Y-m-d\TH:i:s\Z');
             return true;
         });
