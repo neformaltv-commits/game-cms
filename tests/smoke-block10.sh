@@ -102,7 +102,8 @@ RES=$(curl -s -o /dev/null -w '%{http_code}' -b "$CJ" -c "$CJ" \
   --data-urlencode "trigger_id=" \
   --data-urlencode "trigger[name]=First" \
   --data-urlencode "trigger[enabled]=1" --data-urlencode "trigger[once]=1" \
-  --data-urlencode "trigger[when][type]=kill_all" \
+  --data-urlencode "trigger[when][type]=player_touch_emoji" \
+  --data-urlencode "trigger[when][emoji]=💰" \
   --data-urlencode "trigger[then][0][type]=open_exit" \
   --data-urlencode "trigger[then][1][type]=" \
   --data-urlencode "_csrf=$T" "$BASE/admin/game-combat.php")
@@ -115,6 +116,7 @@ RES=$(curl -s -o /dev/null -w '%{http_code}' -b "$CJ" -c "$CJ" \
   --data-urlencode "trigger[enabled]=1" --data-urlencode "trigger[once]=1" \
   --data-urlencode "trigger[when][type]=pickup_count" \
   --data-urlencode "trigger[when][pickup_id]=gold" \
+  --data-urlencode "trigger[when][compare]=gte" \
   --data-urlencode "trigger[when][count]=2" \
   --data-urlencode "trigger[then][0][type]=show_message" \
   --data-urlencode "trigger[then][0][text]=Hello" \

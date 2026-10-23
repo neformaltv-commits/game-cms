@@ -507,8 +507,8 @@ final class LevelService
             $level = $levels[$idx];
             $params = (array)($level['params'] ?? []);
             $trial = array_merge($params, [
-                'victory_conditions' => (array)($conditions['victory_conditions'] ?? []),
-                'defeat_conditions' => (array)($conditions['defeat_conditions'] ?? []),
+                'victory_conditions' => self::normalizeConditionList((array)($conditions['victory_conditions'] ?? [])),
+                'defeat_conditions' => self::normalizeConditionList((array)($conditions['defeat_conditions'] ?? [])),
             ]);
             $errors = TriggerValidator::validate($trial, $legend);
             if ($errors !== []) {
@@ -561,6 +561,12 @@ final class LevelService
      */
     public static function normalizeTrigger(array $input, string $id): array
     {
+        $when = self::normalizeWhen((array)($input['when'] ?? []));
+        // пустой when.type из формы («—») означает отсутствие условия — удаляем ключ,
+        // чтобы валидатор честно сообщил об ошибке, а не «неизвестный тип».
+        if (($when['type'] ?? '') === '') {
+            unset($when['type']);
+        }
         $t = [
             'id' => $id,
             'name' => trim((string)($input['name'] ?? '')),
@@ -570,7 +576,7 @@ final class LevelService
             'once' => array_key_exists('once', $input)
                 ? (filter_var($input['once'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true)
                 : true,
-            'when' => self::normalizeWhen((array)($input['when'] ?? [])),
+            'when' => $when,
             'then' => self::normalizeThenList((array)($input['then'] ?? [])),
         ];
         return $t;
@@ -606,6 +612,38 @@ final class LevelService
     }
 
     /** @param list<mixed> $list @return list<array<string,mixed>> */
+    private static function normalizeConditionList(array $list): array
+    {
+        $out = [];
+        foreach ($list as $c) {
+            if (!is_array($c)) {
+                continue;
+            }
+            $type = trim((string)($c['type'] ?? ''));
+            // пустые строки формы («—») — не условия, пропускаем
+            if ($type === '') {
+                continue;
+            }
+            $item = ['type' => $type];
+            foreach (['value', 'seconds', 'count'] as $f) {
+                if (array_key_exists($f, $c) && is_numeric($c[$f])) {
+                    $item[$f] = 0 + $c[$f];
+                }
+            }
+            foreach (['pickup_id', 'flag_name', 'target_emoji'] as $f) {
+                if (array_key_exists($f, $c)) {
+                    $v = trim((string)$c[$f]);
+                    if ($v !== '') {
+                        $item[$f] = $v;
+                    }
+                }
+            }
+            $out[] = $item;
+        }
+        return $out;
+    }
+
+    /** @param list<mixed> $list @return list<array<string,mixed>> */
     private static function normalizeThenList(array $list): array
     {
         $out = [];
@@ -614,6 +652,10 @@ final class LevelService
                 continue;
             }
             $type = (string)($act['type'] ?? '');
+            // пустые строки формы («—») не являются действиями — пропускаем
+            if ($type === '') {
+                continue;
+            }
             $a = ['type' => $type];
             foreach (['col', 'row', 'count', 'duration_ms', 'amount', 'delta', 'x', 'y'] as $f) {
                 if (array_key_exists($f, $act) && is_numeric($act[$f])) {

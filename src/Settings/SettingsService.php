@@ -117,7 +117,13 @@ final class SettingsService
                 }
             }
             if ($keys === []) {
-                unset($controls[$action]); // пустое значение = действие отключено (опциональное)
+                // пустое значение = действие отключено (опциональное) — только если
+                // пользователь реально отправил обе строки поля (пустые inputs),
+                // иначе поле вне формы не должно затырать существующее назначение.
+                $rows = array_key_exists($action, (array)($_POST['controls_present'] ?? []));
+                if ($rows || !array_key_exists($action, $controls)) {
+                    unset($controls[$action]);
+                }
             } else {
                 $controls[$action] = $keys;
             }
