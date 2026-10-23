@@ -128,7 +128,8 @@ admin_header('Редактор: ' . (string)$game['title'], 'games');
 ?>
 <p><a href="games.php">← Все игры</a> | <b><?= e($game['title']) ?></b>
    (жанр: <?= e((string)($genre['name'] ?? '?')) ?>, движок: <?= e($engine) ?>, статус: <?= e((string)$game['status']) ?>)
-   | <a href="game-settings.php?id=<?= e($game['id']) ?>">Управление и настройки</a></p>
+   | <a href="game-settings.php?id=<?= e($game['id']) ?>">Управление и настройки</a>
+   | <a href="game-combat.php?id=<?= e($game['id']) ?>">Бой и триггеры</a></p>
 
 <?php if ($legendErrors !== []): ?>
 <div class="flash flash-error"><b>Легенда жанра/игры невалидна:</b> <?= e(implode(' ', $legendErrors)) ?></div>

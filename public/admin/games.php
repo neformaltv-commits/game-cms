@@ -122,6 +122,7 @@ $allCategories = $categories->all();
     <td><?= count((array)$g['levels']) ?></td>
     <td>
         <a href="game-edit.php?id=<?= e($g['id']) ?>">Редактор</a>
+        <a href="game-combat.php?id=<?= e($g['id']) ?>">Бой/триггеры</a>
         <?php if ($g['status'] === 'draft'): ?>
         <form method="post" action="games.php" style="display:inline">
             <?= csrf_field() ?><input type="hidden" name="action" value="publish">
