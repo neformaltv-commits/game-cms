@@ -159,6 +159,8 @@ class FileStore
     /**
      * Транзакция: читает, применяет $mutator, пишет (ТЗ 2.4).
      * $mutator принимает &$data; возврат false — не сохранять.
+     * Блокировка удерживается на всё время мутации; внутренняя запись
+     * выполняется без повторного захвата flock (иначе взаимоблокировка).
      */
     public function mutate(string $relativePath, callable $mutator): void
     {
@@ -167,14 +169,75 @@ class FileStore
             if (flock($lock, LOCK_EX) === false) {
                 throw new StorageException("Не удалось заблокировать для мутации: {$relativePath}");
             }
-            $data = $this->read($relativePath);
+            // Читаем напрямую: public read() захватил бы LOCK_SH на том же
+            // дескрипторе файла и заблокировался бы на ожидание нашего LOCK_EX.
+            $data = $this->readLocked($relativePath);
             if ($mutator($data) !== false) {
-                $this->write($relativePath, $data);
+                $this->writeLocked($relativePath, $data);
             }
             flock($lock, LOCK_UN);
         } finally {
             fclose($lock);
         }
+    }
+
+    /**
+     * Чтение при уже удерживаемой блокировке (используется из mutate).
+     */
+    private function readLocked(string $relativePath): mixed
+    {
+        $full = $this->resolvePath($relativePath);
+        if (!file_exists($full)) {
+            return [];
+        }
+        $contents = file_get_contents($full);
+        if ($contents === false) {
+            throw new StorageException("Не удалось прочитать файл: {$relativePath}");
+        }
+        if (trim($contents) === '') {
+            return [];
+        }
+        $data = json_decode($contents, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new StorageException(
+                "Битый JSON в файле {$relativePath}: " . json_last_error_msg()
+            );
+        }
+        return $data;
+    }
+
+    /**
+     * Запись при уже удерживаемой блокировке (используется из mutate).
+     */
+    private function writeLocked(string $relativePath, mixed $data): void
+    {
+        $full = $this->resolvePath($relativePath);
+
+        $json = json_encode(
+            $data,
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+        );
+        if ($json === false || json_last_error() !== JSON_ERROR_NONE) {
+            throw new StorageException(
+                "Ошибка сериализации JSON для {$relativePath}: " . json_last_error_msg()
+            );
+        }
+
+        $dir = dirname($full);
+        if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) {
+            throw new StorageException("Не удалось создать каталог: {$dir}");
+        }
+
+        $tmp = $full . '.tmp.' . bin2hex(random_bytes(8));
+        if (file_put_contents($tmp, $json . "\n") === false) {
+            @unlink($tmp);
+            throw new StorageException("Не удалось записать временный файл: {$relativePath}");
+        }
+        if (!@rename($tmp, $full)) {
+            @unlink($tmp);
+            throw new StorageException("Не удалось переименовать временный файл в {$relativePath}");
+        }
+        @chmod($full, 0644);
     }
 
     /**
@@ -196,16 +259,19 @@ class FileStore
         }
 
         $full = $this->rootDir . '/' . $relativePath;
-        // Если файл существует — проверяем realpath.
-        $real = realpath($full);
-        if ($real !== false && !str_starts_with($real, $this->rootDir . DIRECTORY_SEPARATOR)) {
-            throw new StorageException("Путь вне корневого каталога: {$relativePath}");
+        // Типовая защита: проверяем realpath по ближайшей существующей части пути
+        // (защита от symlink-выходов). Для несуществующих файлов это родительский каталог.
+        $check = $full;
+        while ($check !== $this->rootDir && !file_exists($check)) {
+            $check = dirname($check);
         }
-        // Для записи несуществующего файла дополнительно защищаемся от symlink-атак
-        // по существующей части пути.
-        $dirReal = realpath(dirname($full));
-        if ($dirReal !== false && !str_starts_with($dirReal, $this->rootDir . DIRECTORY_SEPARATOR)) {
-            throw new StorageException("Каталог вне корневого: {$relativePath}");
+        $real = realpath($check);
+        if ($real === false) {
+            throw new StorageException("Каталог не существует: {$relativePath}");
+        }
+        // Проверка на префикс корня (включая сам корень, когда файл/каталог == root).
+        if ($real !== $this->rootDir && !str_starts_with($real, $this->rootDir . DIRECTORY_SEPARATOR)) {
+            throw new StorageException("Путь вне корневого каталога: {$relativePath}");
         }
         return $full;
     }

@@ -41,7 +41,7 @@ abstract class TestCase
         }
     }
 
-    protected function assertCount(int $expected, \Countable $c, string $message = ''): void
+    protected function assertCount(int $expected, \Countable|array $c, string $message = ''): void
     {
         $this->assertSame($expected, count($c), $message ?: 'wrong count');
     }

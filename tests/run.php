@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Минимальный тест-раннер без зависимостей (типичное решение для flat-file проекта).
- * Каждый файл tests/**/Test*.php объявляет класс, расширяющий TestCase.
+ * Каждый файл с именем Test*.php или *Test.php объявляет класс, расширяющий TestCase.
  * Выход: 0 — все зелёные, 1 — есть падения.
  */
 
@@ -17,7 +17,7 @@ ini_set('display_errors', '1');
 $files = [];
 $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(__DIR__, FilesystemIterator::SKIP_DOTS));
 foreach ($it as $f) {
-    if ($f->isFile() && preg_match('/Test.*\.php$/', $f->getFilename())) {
+    if ($f->isFile() && preg_match('/^(?!run\.php$|TestCase\.php$)(Test.*|.*Test)\.php$/', $f->getFilename())) {
         $files[] = $f->getPathname();
     }
 }
