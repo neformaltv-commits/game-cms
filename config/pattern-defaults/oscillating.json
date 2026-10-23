@@ -1,0 +1,608 @@
+[
+  {
+    "id": "sine_horizontal",
+    "name": "Горизонтальная синусоида",
+    "description": "",
+    "category": "oscillating",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Gradius (1985, Konami)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "amplitude",
+        "type": "number",
+        "min": 0.5,
+        "max": 10.0,
+        "default": 3.0,
+        "unit": null,
+        "options": null
+      },
+      {
+        "key": "frequency_hz",
+        "type": "number",
+        "min": 0.05,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "Hz",
+        "options": null
+      },
+      {
+        "key": "phase",
+        "type": "number",
+        "min": 0,
+        "max": 6.28,
+        "default": 0,
+        "unit": null,
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "sine_vertical",
+    "name": "Вертикальная синусоида",
+    "description": "",
+    "category": "oscillating",
+    "supported_engines": [
+      "vertical-scroll"
+    ],
+    "reference": "Xevious (1982, Namco)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "amplitude",
+        "type": "number",
+        "min": 0.5,
+        "max": 10.0,
+        "default": 3.0,
+        "unit": null,
+        "options": null
+      },
+      {
+        "key": "frequency_hz",
+        "type": "number",
+        "min": 0.05,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "Hz",
+        "options": null
+      },
+      {
+        "key": "phase",
+        "type": "number",
+        "min": 0,
+        "max": 6.28,
+        "default": 0,
+        "unit": null,
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "zigzag",
+    "name": "Зигзаг",
+    "description": "",
+    "category": "oscillating",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Xevious (1982)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "segment_length",
+        "type": "number",
+        "min": 1,
+        "max": 20,
+        "default": 4,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "angle_deg",
+        "type": "number",
+        "min": 0,
+        "max": 180,
+        "default": 45,
+        "unit": "deg",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "pendulum",
+    "name": "Маятник",
+    "description": "",
+    "category": "oscillating",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Bubble Bobble (1986)",
+    "params": [
+      {
+        "key": "anchor_x",
+        "type": "number",
+        "min": 0,
+        "max": 32,
+        "default": 16,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "anchor_y",
+        "type": "number",
+        "min": 0,
+        "max": 24,
+        "default": 12,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "length",
+        "type": "number",
+        "min": 1,
+        "max": 20,
+        "default": 5,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "amplitude_deg",
+        "type": "number",
+        "min": 5,
+        "max": 90,
+        "default": 30,
+        "unit": "deg",
+        "options": null
+      },
+      {
+        "key": "frequency_hz",
+        "type": "number",
+        "min": 0.05,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "Hz",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "sawtooth",
+    "name": "Пилообразный",
+    "description": "",
+    "category": "oscillating",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Defender (1980)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "amplitude",
+        "type": "number",
+        "min": 0.5,
+        "max": 10.0,
+        "default": 3.0,
+        "unit": null,
+        "options": null
+      },
+      {
+        "key": "period_tiles",
+        "type": "number",
+        "min": 1,
+        "max": 32,
+        "default": 8,
+        "unit": "tiles",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "triangle_wave",
+    "name": "Треугольная волна",
+    "description": "",
+    "category": "oscillating",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Scramble (1981)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "amplitude",
+        "type": "number",
+        "min": 0.5,
+        "max": 10.0,
+        "default": 3.0,
+        "unit": null,
+        "options": null
+      },
+      {
+        "key": "period_tiles",
+        "type": "number",
+        "min": 1,
+        "max": 32,
+        "default": 8,
+        "unit": "tiles",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "bounce",
+    "name": "Отскок от краёв",
+    "description": "",
+    "category": "oscillating",
+    "supported_engines": [
+      "static-screen",
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Arkanoid (1986, Taito)",
+    "params": [
+      {
+        "key": "speed_x",
+        "type": "number",
+        "min": -5.0,
+        "max": 5.0,
+        "default": 1.0,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "speed_y",
+        "type": "number",
+        "min": -5.0,
+        "max": 5.0,
+        "default": 1.0,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "edge_behavior",
+        "type": "enum",
+        "min": null,
+        "max": null,
+        "default": "bounce",
+        "unit": null,
+        "options": [
+          "bounce",
+          "wrap",
+          "despawn"
+        ]
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "spring",
+    "name": "Пружина",
+    "description": "",
+    "category": "oscillating",
+    "supported_engines": [
+      "horizontal-scroll"
+    ],
+    "reference": "Donkey Kong (1981)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "compression_ratio",
+        "type": "number",
+        "min": 0,
+        "max": 1,
+        "default": 0.5,
+        "unit": null,
+        "options": null
+      },
+      {
+        "key": "period_ms",
+        "type": "number",
+        "min": 100,
+        "max": 10000,
+        "default": 1000,
+        "unit": "ms",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "tremolo",
+    "name": "Дрожание",
+    "description": "",
+    "category": "oscillating",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Bubble Bobble (1986)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "jitter_amplitude",
+        "type": "number",
+        "min": 0,
+        "max": 5,
+        "default": 0.5,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "jitter_frequency",
+        "type": "number",
+        "min": 0.1,
+        "max": 20,
+        "default": 5,
+        "unit": "Hz",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "pulse",
+    "name": "Приближение-удаление",
+    "description": "",
+    "category": "oscillating",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Galaga (1981)",
+    "params": [
+      {
+        "key": "base_x",
+        "type": "number",
+        "min": 0,
+        "max": 32,
+        "default": 16,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "base_y",
+        "type": "number",
+        "min": 0,
+        "max": 24,
+        "default": 12,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "min_distance",
+        "type": "number",
+        "min": 0,
+        "max": 20,
+        "default": 2,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "max_distance",
+        "type": "number",
+        "min": 1,
+        "max": 40,
+        "default": 10,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "period_ms",
+        "type": "number",
+        "min": 100,
+        "max": 10000,
+        "default": 1000,
+        "unit": "ms",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "figure8_small",
+    "name": "Малая восьмёрка",
+    "description": "",
+    "category": "oscillating",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Robotron 2084 (1982, Williams)",
+    "params": [
+      {
+        "key": "center_x",
+        "type": "number",
+        "min": 0,
+        "max": 32,
+        "default": 16,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "center_y",
+        "type": "number",
+        "min": 0,
+        "max": 24,
+        "default": 12,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "amplitude",
+        "type": "number",
+        "min": 0.5,
+        "max": 10.0,
+        "default": 3.0,
+        "unit": null,
+        "options": null
+      },
+      {
+        "key": "frequency_hz",
+        "type": "number",
+        "min": 0.05,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "Hz",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "random_jitter",
+    "name": "Случайное дрожание",
+    "description": "",
+    "category": "oscillating",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Asteroids (1979, Atari)",
+    "params": [
+      {
+        "key": "base_speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 10.0,
+        "default": 1.0,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "jitter_amplitude",
+        "type": "number",
+        "min": 0,
+        "max": 5,
+        "default": 0.5,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "jitter_frequency",
+        "type": "number",
+        "min": 0.1,
+        "max": 20,
+        "default": 5,
+        "unit": "Hz",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  }
+]

@@ -1,0 +1,566 @@
+[
+  {
+    "id": "chase",
+    "name": "Прямое преследование",
+    "description": "",
+    "category": "pursuit",
+    "supported_engines": [
+      "static-screen",
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Pac-Man (1980) — Blinky",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "turn_on_wall",
+        "type": "boolean",
+        "min": null,
+        "max": null,
+        "default": true,
+        "unit": null,
+        "options": null
+      },
+      {
+        "key": "pathfinding",
+        "type": "enum",
+        "min": null,
+        "max": null,
+        "default": "greedy",
+        "unit": null,
+        "options": [
+          "direct",
+          "greedy",
+          "astar"
+        ]
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z"
+  },
+  {
+    "id": "chase_with_vision",
+    "name": "Преследование при обнаружении",
+    "description": "",
+    "category": "pursuit",
+    "supported_engines": [
+      "static-screen",
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Bomberman (1983)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "vision_range",
+        "type": "number",
+        "min": 1,
+        "max": 30,
+        "default": 8,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "lose_range",
+        "type": "number",
+        "min": 1,
+        "max": 40,
+        "default": 15,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "pathfinding",
+        "type": "enum",
+        "min": null,
+        "max": null,
+        "default": "greedy",
+        "unit": null,
+        "options": [
+          "direct",
+          "greedy",
+          "astar"
+        ]
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z"
+  },
+  {
+    "id": "chase_astar",
+    "name": "Преследование с A*",
+    "description": "",
+    "category": "pursuit",
+    "supported_engines": [
+      "static-screen",
+      "horizontal-scroll"
+    ],
+    "reference": "The Trap Door (1986, Piranha)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "grid_weight",
+        "type": "number",
+        "min": 0.1,
+        "max": 10.0,
+        "default": 1.0,
+        "unit": null,
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z"
+  },
+  {
+    "id": "guard",
+    "name": "Страж",
+    "description": "",
+    "category": "pursuit",
+    "supported_engines": [
+      "static-screen",
+      "horizontal-scroll"
+    ],
+    "reference": "Super Mario Bros. (Hammer Bro)",
+    "params": [
+      {
+        "key": "patrol_speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "chase_speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 1.0,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "post_position",
+        "type": "string",
+        "min": null,
+        "max": null,
+        "default": "",
+        "unit": null,
+        "options": null
+      },
+      {
+        "key": "vision_range",
+        "type": "number",
+        "min": 1,
+        "max": 30,
+        "default": 8,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "return_after_ms",
+        "type": "number",
+        "min": 100,
+        "max": 10000,
+        "default": 2000,
+        "unit": "ms",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z"
+  },
+  {
+    "id": "ambush",
+    "name": "Засада",
+    "description": "",
+    "category": "pursuit",
+    "supported_engines": [
+      "static-screen",
+      "horizontal-scroll"
+    ],
+    "reference": "Atic Atac (1983)",
+    "params": [
+      {
+        "key": "wait_position",
+        "type": "string",
+        "min": null,
+        "max": null,
+        "default": "",
+        "unit": null,
+        "options": null
+      },
+      {
+        "key": "trigger_range",
+        "type": "number",
+        "min": 1,
+        "max": 20,
+        "default": 4,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "then_ai",
+        "type": "string",
+        "min": null,
+        "max": null,
+        "default": "",
+        "unit": null,
+        "options": null
+      },
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z"
+  },
+  {
+    "id": "kamikaze",
+    "name": "Камикадзе",
+    "description": "",
+    "category": "pursuit",
+    "supported_engines": [
+      "static-screen",
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Bomb Jack (1984, Tehkan)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "trigger_range",
+        "type": "number",
+        "min": 1,
+        "max": 20,
+        "default": 4,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "explosion_damage",
+        "type": "number",
+        "min": 0,
+        "max": 100,
+        "default": 1,
+        "unit": "hp",
+        "options": null
+      },
+      {
+        "key": "explosion_radius",
+        "type": "number",
+        "min": 0.5,
+        "max": 8.0,
+        "default": 2.0,
+        "unit": "tiles",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z"
+  },
+  {
+    "id": "flee",
+    "name": "Убегает",
+    "description": "",
+    "category": "pursuit",
+    "supported_engines": [
+      "static-screen"
+    ],
+    "reference": "Pac-Man (Clyde)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "flee_range",
+        "type": "number",
+        "min": 1,
+        "max": 20,
+        "default": 6,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "turn_on_wall",
+        "type": "boolean",
+        "min": null,
+        "max": null,
+        "default": true,
+        "unit": null,
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z"
+  },
+  {
+    "id": "pacman_ghost",
+    "name": "Призраки Pac-Man",
+    "description": "",
+    "category": "pursuit",
+    "supported_engines": [
+      "static-screen"
+    ],
+    "reference": "Pac-Man (1980)",
+    "params": [
+      {
+        "key": "mode",
+        "type": "enum",
+        "min": null,
+        "max": null,
+        "default": "blinky",
+        "unit": null,
+        "options": [
+          "blinky",
+          "pinky",
+          "inky",
+          "clyde"
+        ]
+      },
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "scatter_duration_ms",
+        "type": "number",
+        "min": 100,
+        "max": 20000,
+        "default": 5000,
+        "unit": "ms",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z"
+  },
+  {
+    "id": "trapper",
+    "name": "Отрезает путь",
+    "description": "",
+    "category": "pursuit",
+    "supported_engines": [
+      "static-screen"
+    ],
+    "reference": "Bubble Bobble (1986)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "cutoff_distance",
+        "type": "number",
+        "min": 1,
+        "max": 20,
+        "default": 5,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "pathfinding",
+        "type": "enum",
+        "min": null,
+        "max": null,
+        "default": "greedy",
+        "unit": null,
+        "options": [
+          "direct",
+          "greedy",
+          "astar"
+        ]
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z"
+  },
+  {
+    "id": "line_of_sight_chaser",
+    "name": "Атакует по прямой в поле зрения",
+    "description": "",
+    "category": "pursuit",
+    "supported_engines": [
+      "horizontal-scroll"
+    ],
+    "reference": "Myth (1989, System 3)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "vision_range",
+        "type": "number",
+        "min": 1,
+        "max": 30,
+        "default": 8,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "vision_angle_deg",
+        "type": "number",
+        "min": 10,
+        "max": 180,
+        "default": 90,
+        "unit": "deg",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z"
+  },
+  {
+    "id": "zombie_chase",
+    "name": "Медленное преследование",
+    "description": "",
+    "category": "pursuit",
+    "supported_engines": [
+      "static-screen",
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Zombies (1984, Loriciels)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "vision_range",
+        "type": "number",
+        "min": 1,
+        "max": 30,
+        "default": 8,
+        "unit": "tiles",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z"
+  },
+  {
+    "id": "predictive_chase",
+    "name": "С предсказанием",
+    "description": "",
+    "category": "pursuit",
+    "supported_engines": [
+      "vertical-scroll",
+      "horizontal-scroll"
+    ],
+    "reference": "Defender (1980, Williams)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "lookahead_frames",
+        "type": "number",
+        "min": 1,
+        "max": 60,
+        "default": 10,
+        "unit": "frames",
+        "options": null
+      },
+      {
+        "key": "pathfinding",
+        "type": "enum",
+        "min": null,
+        "max": null,
+        "default": "greedy",
+        "unit": null,
+        "options": [
+          "direct",
+          "greedy",
+          "astar"
+        ]
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z"
+  }
+]

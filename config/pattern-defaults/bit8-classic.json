@@ -1,0 +1,323 @@
+[
+  {
+    "id": "space_invaders_march",
+    "name": "Маршировка Space Invaders",
+    "description": "",
+    "category": "bit8-classic",
+    "supported_engines": [
+      "vertical-scroll"
+    ],
+    "reference": "Space Invaders (1978)",
+    "params": [
+      {
+        "key": "initial_speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 10.0,
+        "default": 1.0,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "acceleration_per_kill",
+        "type": "number",
+        "min": 0,
+        "max": 1,
+        "default": 0.01,
+        "unit": null,
+        "options": null
+      },
+      {
+        "key": "step_dx",
+        "type": "number",
+        "min": -5,
+        "max": 5,
+        "default": 1,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "step_dy",
+        "type": "number",
+        "min": 0,
+        "max": 5,
+        "default": 1,
+        "unit": "tiles",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "galaga_formation",
+    "name": "Формация Galaga",
+    "description": "",
+    "category": "bit8-classic",
+    "supported_engines": [
+      "vertical-scroll"
+    ],
+    "reference": "Galaga (1981)",
+    "params": [
+      {
+        "key": "formation_type",
+        "type": "enum",
+        "min": null,
+        "max": null,
+        "default": "v",
+        "unit": null,
+        "options": [
+          "v",
+          "line",
+          "echelon"
+        ]
+      },
+      {
+        "key": "spacing",
+        "type": "number",
+        "min": 0.5,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "sway_amplitude",
+        "type": "number",
+        "min": 0,
+        "max": 5,
+        "default": 1,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "sway_frequency",
+        "type": "number",
+        "min": 0.05,
+        "max": 5.0,
+        "default": 0.5,
+        "unit": "Hz",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "galaga_dive",
+    "name": "Пикирование Galaga",
+    "description": "",
+    "category": "bit8-classic",
+    "supported_engines": [
+      "vertical-scroll"
+    ],
+    "reference": "Galaga (1981)",
+    "params": [
+      {
+        "key": "dive_speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 10.0,
+        "default": 2.0,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "spiral_radius",
+        "type": "number",
+        "min": 0.5,
+        "max": 20,
+        "default": 4,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "return_to_formation",
+        "type": "boolean",
+        "min": null,
+        "max": null,
+        "default": true,
+        "unit": null,
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "defender_scan",
+    "name": "Скан Defender",
+    "description": "",
+    "category": "bit8-classic",
+    "supported_engines": [
+      "vertical-scroll"
+    ],
+    "reference": "Defender (1980)",
+    "params": [
+      {
+        "key": "scan_speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 10.0,
+        "default": 1.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "wave_amplitude",
+        "type": "number",
+        "min": 0.5,
+        "max": 10.0,
+        "default": 3.0,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "wave_frequency",
+        "type": "number",
+        "min": 0.05,
+        "max": 5.0,
+        "default": 0.5,
+        "unit": "Hz",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "xevious_zigzag",
+    "name": "Зигзаг Xevious",
+    "description": "",
+    "category": "bit8-classic",
+    "supported_engines": [
+      "vertical-scroll"
+    ],
+    "reference": "Xevious (1982)",
+    "params": [
+      {
+        "key": "zigzag_amplitude",
+        "type": "number",
+        "min": 0.5,
+        "max": 10.0,
+        "default": 3.0,
+        "unit": "tiles",
+        "options": null
+      },
+      {
+        "key": "zigzag_frequency",
+        "type": "number",
+        "min": 0.05,
+        "max": 5.0,
+        "default": 0.5,
+        "unit": "Hz",
+        "options": null
+      },
+      {
+        "key": "forward_speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 10.0,
+        "default": 1.0,
+        "unit": "tiles/frame",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "pacman_ghost_door",
+    "name": "Выход из домика",
+    "description": "",
+    "category": "bit8-classic",
+    "supported_engines": [
+      "static-screen"
+    ],
+    "reference": "Pac-Man (1980)",
+    "params": [
+      {
+        "key": "exit_delay_ms",
+        "type": "number",
+        "min": 0,
+        "max": 10000,
+        "default": 1000,
+        "unit": "ms",
+        "options": null
+      },
+      {
+        "key": "exit_speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 5.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  },
+  {
+    "id": "asteroids_drift",
+    "name": "Дрейф Asteroids",
+    "description": "",
+    "category": "bit8-classic",
+    "supported_engines": [
+      "vertical-scroll"
+    ],
+    "reference": "Asteroids (1979)",
+    "params": [
+      {
+        "key": "speed",
+        "type": "number",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 0.5,
+        "unit": "tiles/frame",
+        "options": null
+      },
+      {
+        "key": "rotation_rate_deg_sec",
+        "type": "number",
+        "min": 1,
+        "max": 720,
+        "default": 90,
+        "unit": "deg/s",
+        "options": null
+      },
+      {
+        "key": "screen_wrap",
+        "type": "boolean",
+        "min": null,
+        "max": null,
+        "default": true,
+        "unit": null,
+        "options": null
+      }
+    ],
+    "custom": false,
+    "created_at": "2026-10-23T00:00:00Z",
+    "updated_at": "2026-10-23T00:00:00Z",
+    "trajectory_hint": "",
+    "on_finish": "despawn"
+  }
+]
