@@ -1,363 +1,363 @@
 [
-  {
-    "id": "bezier",
-    "name": "Кривая Безье",
-    "description": "",
-    "category": "composite",
-    "supported_engines": [
-      "static-screen",
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Moon Patrol (1982, Irem)",
-    "params": [
-      {
-        "key": "duration_ms",
-        "type": "number",
-        "min": 100,
-        "max": 60000,
-        "default": 5000,
-        "unit": "ms",
-        "options": null
-      },
-      {
-        "key": "loop",
-        "type": "boolean",
-        "min": null,
-        "max": null,
-        "default": true,
-        "unit": null,
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  },
-  {
-    "id": "scatter",
-    "name": "Хаотичное движение",
-    "description": "",
-    "category": "composite",
-    "supported_engines": [
-      "static-screen",
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Asteroids (1979)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "change_dir_ms",
-        "type": "number",
-        "min": 100,
-        "max": 10000,
-        "default": 1000,
-        "unit": "ms",
-        "options": null
-      },
-      {
-        "key": "turn_angle_max_deg",
-        "type": "number",
-        "min": 5,
-        "max": 180,
-        "default": 45,
-        "unit": "deg",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  },
-  {
-    "id": "teleport",
-    "name": "Телепортация",
-    "description": "",
-    "category": "composite",
-    "supported_engines": [
-      "static-screen",
-      "horizontal-scroll"
-    ],
-    "reference": "Bubble Bobble (1986)",
-    "params": [
-      {
-        "key": "teleport_interval_ms",
-        "type": "number",
-        "min": 100,
-        "max": 20000,
-        "default": 3000,
-        "unit": "ms",
-        "options": null
-      },
-      {
-        "key": "target_zone",
-        "type": "enum",
-        "min": null,
-        "max": null,
-        "default": "random",
-        "unit": null,
-        "options": [
-          "random",
-          "fixed"
-        ]
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  },
-  {
-    "id": "barrel_roll",
-    "name": "Бочка",
-    "description": "",
-    "category": "composite",
-    "supported_engines": [
-      "vertical-scroll"
-    ],
-    "reference": "Scramble (1981)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "roll_radius",
-        "type": "number",
-        "min": 0.5,
-        "max": 10,
-        "default": 2,
-        "unit": "tiles",
-        "options": null
-      },
-      {
-        "key": "roll_frequency_hz",
-        "type": "number",
-        "min": 0.05,
-        "max": 5.0,
-        "default": 0.5,
-        "unit": "Hz",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  },
-  {
-    "id": "wave_packet",
-    "name": "Волновой пакет",
-    "description": "",
-    "category": "composite",
-    "supported_engines": [
-      "vertical-scroll"
-    ],
-    "reference": "Gradius (1985)",
-    "params": [
-      {
-        "key": "base_speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 10.0,
-        "default": 1.0,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "wave_amplitude",
-        "type": "number",
-        "min": 0.5,
-        "max": 10.0,
-        "default": 3.0,
-        "unit": "tiles",
-        "options": null
-      },
-      {
-        "key": "wave_frequency_hz",
-        "type": "number",
-        "min": 0.05,
-        "max": 5.0,
-        "default": 0.5,
-        "unit": "Hz",
-        "options": null
-      },
-      {
-        "key": "packet_length",
-        "type": "number",
-        "min": 1,
-        "max": 20,
-        "default": 6,
-        "unit": "tiles",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  },
-  {
-    "id": "constrained_random",
-    "name": "Ограниченный дрейф",
-    "description": "",
-    "category": "composite",
-    "supported_engines": [
-      "static-screen",
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Asteroids (1979)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "drift_radius",
-        "type": "number",
-        "min": 1,
-        "max": 10,
-        "default": 3,
-        "unit": "tiles",
-        "options": null
-      },
-      {
-        "key": "change_dir_ms",
-        "type": "number",
-        "min": 100,
-        "max": 10000,
-        "default": 1000,
-        "unit": "ms",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  },
-  {
-    "id": "stop_and_go",
-    "name": "Стоп-энд-гоу",
-    "description": "",
-    "category": "composite",
-    "supported_engines": [
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Space Invaders (1978)",
-    "params": [
-      {
-        "key": "move_speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 10.0,
-        "default": 1.0,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "move_ms",
-        "type": "number",
-        "min": 100,
-        "max": 10000,
-        "default": 800,
-        "unit": "ms",
-        "options": null
-      },
-      {
-        "key": "pause_ms",
-        "type": "number",
-        "min": 0,
-        "max": 10000,
-        "default": 400,
-        "unit": "ms",
-        "options": null
-      },
-      {
-        "key": "direction",
-        "type": "enum",
-        "min": null,
-        "max": null,
-        "default": "right",
-        "unit": null,
-        "options": [
-          "left",
-          "right"
-        ]
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  },
-  {
-    "id": "reverse_on_wall",
-    "name": "Отражение от стен",
-    "description": "",
-    "category": "composite",
-    "supported_engines": [
-      "static-screen",
-      "horizontal-scroll"
-    ],
-    "reference": "Arkanoid (1986)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "wall_behavior",
-        "type": "enum",
-        "min": null,
-        "max": null,
-        "default": "reflect",
-        "unit": null,
-        "options": [
-          "reflect",
-          "despawn"
-        ]
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z",
-    "trajectory_hint": "",
-    "on_finish": "despawn"
-  }
+    {
+        "id": "bezier",
+        "name": "Кривая Безье",
+        "description": "Кривая Безье — модель поведения из классических 8-битных игр: Moon Patrol (1982, Irem).",
+        "category": "composite",
+        "supported_engines": [
+            "static-screen",
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Moon Patrol (1982, Irem)",
+        "params": [
+            {
+                "key": "duration_ms",
+                "type": "number",
+                "min": 100,
+                "max": 60000,
+                "default": 5000,
+                "unit": "ms",
+                "options": null
+            },
+            {
+                "key": "loop",
+                "type": "boolean",
+                "min": null,
+                "max": null,
+                "default": true,
+                "unit": null,
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    },
+    {
+        "id": "scatter",
+        "name": "Хаотичное движение",
+        "description": "Хаотичное движение — модель поведения из классических 8-битных игр: Asteroids (1979).",
+        "category": "composite",
+        "supported_engines": [
+            "static-screen",
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Asteroids (1979)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "change_dir_ms",
+                "type": "number",
+                "min": 100,
+                "max": 10000,
+                "default": 1000,
+                "unit": "ms",
+                "options": null
+            },
+            {
+                "key": "turn_angle_max_deg",
+                "type": "number",
+                "min": 5,
+                "max": 180,
+                "default": 45,
+                "unit": "deg",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    },
+    {
+        "id": "teleport",
+        "name": "Телепортация",
+        "description": "Телепортация — модель поведения из классических 8-битных игр: Bubble Bobble (1986).",
+        "category": "composite",
+        "supported_engines": [
+            "static-screen",
+            "horizontal-scroll"
+        ],
+        "reference": "Bubble Bobble (1986)",
+        "params": [
+            {
+                "key": "teleport_interval_ms",
+                "type": "number",
+                "min": 100,
+                "max": 20000,
+                "default": 3000,
+                "unit": "ms",
+                "options": null
+            },
+            {
+                "key": "target_zone",
+                "type": "enum",
+                "min": null,
+                "max": null,
+                "default": "random",
+                "unit": null,
+                "options": [
+                    "random",
+                    "fixed"
+                ]
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    },
+    {
+        "id": "barrel_roll",
+        "name": "Бочка",
+        "description": "Бочка — модель поведения из классических 8-битных игр: Scramble (1981).",
+        "category": "composite",
+        "supported_engines": [
+            "vertical-scroll"
+        ],
+        "reference": "Scramble (1981)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "roll_radius",
+                "type": "number",
+                "min": 0.5,
+                "max": 10,
+                "default": 2,
+                "unit": "tiles",
+                "options": null
+            },
+            {
+                "key": "roll_frequency_hz",
+                "type": "number",
+                "min": 0.05,
+                "max": 5,
+                "default": 0.5,
+                "unit": "Hz",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    },
+    {
+        "id": "wave_packet",
+        "name": "Волновой пакет",
+        "description": "Волновой пакет — модель поведения из классических 8-битных игр: Gradius (1985).",
+        "category": "composite",
+        "supported_engines": [
+            "vertical-scroll"
+        ],
+        "reference": "Gradius (1985)",
+        "params": [
+            {
+                "key": "base_speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 10,
+                "default": 1,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "wave_amplitude",
+                "type": "number",
+                "min": 0.5,
+                "max": 10,
+                "default": 3,
+                "unit": "tiles",
+                "options": null
+            },
+            {
+                "key": "wave_frequency_hz",
+                "type": "number",
+                "min": 0.05,
+                "max": 5,
+                "default": 0.5,
+                "unit": "Hz",
+                "options": null
+            },
+            {
+                "key": "packet_length",
+                "type": "number",
+                "min": 1,
+                "max": 20,
+                "default": 6,
+                "unit": "tiles",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    },
+    {
+        "id": "constrained_random",
+        "name": "Ограниченный дрейф",
+        "description": "Ограниченный дрейф — модель поведения из классических 8-битных игр: Asteroids (1979).",
+        "category": "composite",
+        "supported_engines": [
+            "static-screen",
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Asteroids (1979)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "drift_radius",
+                "type": "number",
+                "min": 1,
+                "max": 10,
+                "default": 3,
+                "unit": "tiles",
+                "options": null
+            },
+            {
+                "key": "change_dir_ms",
+                "type": "number",
+                "min": 100,
+                "max": 10000,
+                "default": 1000,
+                "unit": "ms",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    },
+    {
+        "id": "stop_and_go",
+        "name": "Стоп-энд-гоу",
+        "description": "Стоп-энд-гоу — модель поведения из классических 8-битных игр: Space Invaders (1978).",
+        "category": "composite",
+        "supported_engines": [
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Space Invaders (1978)",
+        "params": [
+            {
+                "key": "move_speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 10,
+                "default": 1,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "move_ms",
+                "type": "number",
+                "min": 100,
+                "max": 10000,
+                "default": 800,
+                "unit": "ms",
+                "options": null
+            },
+            {
+                "key": "pause_ms",
+                "type": "number",
+                "min": 0,
+                "max": 10000,
+                "default": 400,
+                "unit": "ms",
+                "options": null
+            },
+            {
+                "key": "direction",
+                "type": "enum",
+                "min": null,
+                "max": null,
+                "default": "right",
+                "unit": null,
+                "options": [
+                    "left",
+                    "right"
+                ]
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    },
+    {
+        "id": "reverse_on_wall",
+        "name": "Отражение от стен",
+        "description": "Отражение от стен — модель поведения из классических 8-битных игр: Arkanoid (1986).",
+        "category": "composite",
+        "supported_engines": [
+            "static-screen",
+            "horizontal-scroll"
+        ],
+        "reference": "Arkanoid (1986)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "wall_behavior",
+                "type": "enum",
+                "min": null,
+                "max": null,
+                "default": "reflect",
+                "unit": null,
+                "options": [
+                    "reflect",
+                    "despawn"
+                ]
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z",
+        "trajectory_hint": "",
+        "on_finish": "despawn"
+    }
 ]

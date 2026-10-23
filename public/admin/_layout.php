@@ -38,6 +38,8 @@ function admin_header(string $title, string $active = ''): void
         <a href="/admin/genres.php" class="<?= $active === 'genres' ? 'active' : '' ?>">Жанры</a>
         <a href="/admin/categories.php" class="<?= $active === 'categories' ? 'active' : '' ?>">Категории</a>
         <a href="/admin/references.php" class="<?= $active === 'references' ? 'active' : '' ?>">Референсы</a>
+        <a href="/admin/ai-models.php" class="<?= $active === 'ai-models' ? 'active' : '' ?>">AI-модели</a>
+        <a href="/admin/movement-patterns.php" class="<?= $active === 'patterns' ? 'active' : '' ?>">Паттерны</a>
         <a href="/admin/users.php" class="<?= $active === 'users' ? 'active' : '' ?>">Пользователи</a>
         <a href="/admin/audit.php" class="<?= $active === 'audit' ? 'active' : '' ?>">Аудит</a>
     </nav>

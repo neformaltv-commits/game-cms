@@ -29,11 +29,18 @@ final class LibraryService
     /** @var list<string> */
     private array $categories;
 
+    /** @var string Корень проекта (для доступа к config/ фикстурам). */
+    private string $projectRoot;
+
     public function __construct(
         private readonly FileStore $store,
         private readonly \App\Audit\Logger $audit,
         private readonly string $kind,
+        ?string $projectRoot = null,
     ) {
+        // Корень проекта по умолчанию — родитель каталога данных;
+        // в тестах передаётся явный путь (tmp-каталог лежит вне дерева проекта).
+        $this->projectRoot = $projectRoot ?? dirname($store->getRootDir());
         if ($kind === self::KIND_AI) {
             $this->file = 'ai-models.json';
             $this->fixtureDir = 'config/ai-defaults';
@@ -230,8 +237,11 @@ final class LibraryService
     {
         $fixtures = [];
         foreach ($this->categories as $cat) {
-            $path = $this->fixtureDir . '/' . $cat . '.json';
-            $data = $this->store->read($path, []);
+            $path = $this->projectRoot . '/' . $this->fixtureDir . '/' . $cat . '.json';
+            if (!is_file($path)) {
+                throw new LibraryException('Фикстура не найдена: ' . $path);
+            }
+            $data = json_decode((string)file_get_contents($path), true);
             if (!is_array($data)) {
                 throw new LibraryException('Фикстура не является списком: ' . $path);
             }

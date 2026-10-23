@@ -53,6 +53,13 @@ abstract class TestCase
         }
     }
 
+    protected function assertNull(mixed $v, string $message = 'expected null'): void
+    {
+        if ($v !== null) {
+            throw new RuntimeException($message . ': ' . var_export($v, true));
+        }
+    }
+
     /** @param array<array-key,mixed>|string $haystack */
     protected function assertContains(mixed $needle, array|string $haystack, string $message = ''): void
     {

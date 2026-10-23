@@ -1,480 +1,480 @@
 [
-  {
-    "id": "stationary",
-    "name": "Неподвижный",
-    "description": "",
-    "category": "movement",
-    "supported_engines": [
-      "static-screen",
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Классика 8-бит",
-    "params": [],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "patrol_horizontal",
-    "name": "Патруль по горизонтали",
-    "description": "",
-    "category": "movement",
-    "supported_engines": [
-      "static-screen",
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Super Mario Bros. (1985, Nintendo)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "range",
-        "type": "number",
-        "min": 1,
-        "max": 20,
-        "default": 5,
-        "unit": "tiles",
-        "options": null
-      },
-      {
-        "key": "turn_on_wall",
-        "type": "boolean",
-        "min": null,
-        "max": null,
-        "default": true,
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "turn_on_edge",
-        "type": "boolean",
-        "min": null,
-        "max": null,
-        "default": true,
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "pause_at_ends_ms",
-        "type": "number",
-        "min": 0,
-        "max": 5000,
-        "default": 500,
-        "unit": "ms",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "patrol_vertical",
-    "name": "Патруль по вертикали",
-    "description": "",
-    "category": "movement",
-    "supported_engines": [
-      "static-screen",
-      "vertical-scroll"
-    ],
-    "reference": "Lode Runner (1983, Broderbund)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "range",
-        "type": "number",
-        "min": 1,
-        "max": 20,
-        "default": 5,
-        "unit": "tiles",
-        "options": null
-      },
-      {
-        "key": "pause_at_ends_ms",
-        "type": "number",
-        "min": 0,
-        "max": 5000,
-        "default": 500,
-        "unit": "ms",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "patrol_waypoints",
-    "name": "Патруль по точкам",
-    "description": "",
-    "category": "movement",
-    "supported_engines": [
-      "static-screen",
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Bubble Bobble (1986, Taito)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "loop",
-        "type": "boolean",
-        "min": null,
-        "max": null,
-        "default": true,
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "pause_at_waypoints_ms",
-        "type": "number",
-        "min": 0,
-        "max": 5000,
-        "default": 500,
-        "unit": "ms",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "patrol_random",
-    "name": "Случайные развороты",
-    "description": "",
-    "category": "movement",
-    "supported_engines": [
-      "static-screen",
-      "vertical-scroll",
-      "horizontal-scroll"
-    ],
-    "reference": "Mr. Do! (1982, Universal)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "turn_chance_per_sec",
-        "type": "number",
-        "min": 0,
-        "max": 10,
-        "default": 2,
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "turn_on_wall",
-        "type": "boolean",
-        "min": null,
-        "max": null,
-        "default": true,
-        "unit": null,
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "wander",
-    "name": "Блуждание",
-    "description": "",
-    "category": "movement",
-    "supported_engines": [
-      "static-screen",
-      "horizontal-scroll"
-    ],
-    "reference": "Pac-Man (1980, Namco)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "change_dir_ms",
-        "type": "number",
-        "min": 100,
-        "max": 10000,
-        "default": 1000,
-        "unit": "ms",
-        "options": null
-      },
-      {
-        "key": "turn_on_wall",
-        "type": "boolean",
-        "min": null,
-        "max": null,
-        "default": true,
-        "unit": null,
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "random_walk",
-    "name": "Случайное блуждание",
-    "description": "",
-    "category": "movement",
-    "supported_engines": [
-      "static-screen"
-    ],
-    "reference": "Atic Atac (1983, Ultimate)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "change_dir_ms",
-        "type": "number",
-        "min": 100,
-        "max": 10000,
-        "default": 1000,
-        "unit": "ms",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "ghost_phase",
-    "name": "Проходит сквозь стены",
-    "description": "",
-    "category": "movement",
-    "supported_engines": [
-      "static-screen"
-    ],
-    "reference": "Bubble Bobble (1986, Taito)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "phase_interval_ms",
-        "type": "number",
-        "min": 100,
-        "max": 10000,
-        "default": 2000,
-        "unit": "ms",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "ladder_user",
-    "name": "Использует лестницы",
-    "description": "",
-    "category": "movement",
-    "supported_engines": [
-      "static-screen",
-      "horizontal-scroll"
-    ],
-    "reference": "Lode Runner (1983)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "pathfinding",
-        "type": "enum",
-        "min": null,
-        "max": null,
-        "default": "greedy",
-        "unit": null,
-        "options": [
-          "direct",
-          "greedy",
-          "astar"
-        ]
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "platform_edge_aware",
-    "name": "Учитывает края платформ",
-    "description": "",
-    "category": "movement",
-    "supported_engines": [
-      "horizontal-scroll"
-    ],
-    "reference": "Super Mario Bros. (1985)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "turn_on_edge",
-        "type": "boolean",
-        "min": null,
-        "max": null,
-        "default": true,
-        "unit": null,
-        "options": null
-      },
-      {
-        "key": "ledge_jump_chance",
-        "type": "number",
-        "min": 0,
-        "max": 1,
-        "default": 0.3,
-        "unit": null,
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "jumper",
-    "name": "Прыгающий",
-    "description": "",
-    "category": "movement",
-    "supported_engines": [
-      "horizontal-scroll"
-    ],
-    "reference": "Donkey Kong (1981, Nintendo)",
-    "params": [
-      {
-        "key": "jump_power",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 1.0,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "jump_interval_ms",
-        "type": "number",
-        "min": 100,
-        "max": 10000,
-        "default": 1000,
-        "unit": "ms",
-        "options": null
-      },
-      {
-        "key": "horizontal_drift",
-        "type": "number",
-        "min": -2.0,
-        "max": 2.0,
-        "default": 0.0,
-        "unit": "tiles",
-        "options": null
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  },
-  {
-    "id": "mimic_player_mirror",
-    "name": "Зеркалит игрока",
-    "description": "",
-    "category": "movement",
-    "supported_engines": [
-      "static-screen",
-      "horizontal-scroll"
-    ],
-    "reference": "Shadow of the Beast (1989, Psygnosis)",
-    "params": [
-      {
-        "key": "speed",
-        "type": "number",
-        "min": 0.1,
-        "max": 3.0,
-        "default": 0.5,
-        "unit": "tiles/frame",
-        "options": null
-      },
-      {
-        "key": "axis",
-        "type": "enum",
-        "min": null,
-        "max": null,
-        "default": "both",
-        "unit": null,
-        "options": [
-          "horizontal",
-          "vertical",
-          "both"
-        ]
-      }
-    ],
-    "custom": false,
-    "created_at": "2026-10-23T00:00:00Z",
-    "updated_at": "2026-10-23T00:00:00Z"
-  }
+    {
+        "id": "stationary",
+        "name": "Неподвижный",
+        "description": "Неподвижный — модель поведения из классических 8-битных игр: Классика 8-бит.",
+        "category": "movement",
+        "supported_engines": [
+            "static-screen",
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Классика 8-бит",
+        "params": [],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "patrol_horizontal",
+        "name": "Патруль по горизонтали",
+        "description": "Патруль по горизонтали — модель поведения из классических 8-битных игр: Super Mario Bros. (1985, Nintendo).",
+        "category": "movement",
+        "supported_engines": [
+            "static-screen",
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Super Mario Bros. (1985, Nintendo)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "range",
+                "type": "number",
+                "min": 1,
+                "max": 20,
+                "default": 5,
+                "unit": "tiles",
+                "options": null
+            },
+            {
+                "key": "turn_on_wall",
+                "type": "boolean",
+                "min": null,
+                "max": null,
+                "default": true,
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "turn_on_edge",
+                "type": "boolean",
+                "min": null,
+                "max": null,
+                "default": true,
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "pause_at_ends_ms",
+                "type": "number",
+                "min": 0,
+                "max": 5000,
+                "default": 500,
+                "unit": "ms",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "patrol_vertical",
+        "name": "Патруль по вертикали",
+        "description": "Патруль по вертикали — модель поведения из классических 8-битных игр: Lode Runner (1983, Broderbund).",
+        "category": "movement",
+        "supported_engines": [
+            "static-screen",
+            "vertical-scroll"
+        ],
+        "reference": "Lode Runner (1983, Broderbund)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "range",
+                "type": "number",
+                "min": 1,
+                "max": 20,
+                "default": 5,
+                "unit": "tiles",
+                "options": null
+            },
+            {
+                "key": "pause_at_ends_ms",
+                "type": "number",
+                "min": 0,
+                "max": 5000,
+                "default": 500,
+                "unit": "ms",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "patrol_waypoints",
+        "name": "Патруль по точкам",
+        "description": "Патруль по точкам — модель поведения из классических 8-битных игр: Bubble Bobble (1986, Taito).",
+        "category": "movement",
+        "supported_engines": [
+            "static-screen",
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Bubble Bobble (1986, Taito)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "loop",
+                "type": "boolean",
+                "min": null,
+                "max": null,
+                "default": true,
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "pause_at_waypoints_ms",
+                "type": "number",
+                "min": 0,
+                "max": 5000,
+                "default": 500,
+                "unit": "ms",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "patrol_random",
+        "name": "Случайные развороты",
+        "description": "Случайные развороты — модель поведения из классических 8-битных игр: Mr. Do! (1982, Universal).",
+        "category": "movement",
+        "supported_engines": [
+            "static-screen",
+            "vertical-scroll",
+            "horizontal-scroll"
+        ],
+        "reference": "Mr. Do! (1982, Universal)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "turn_chance_per_sec",
+                "type": "number",
+                "min": 0,
+                "max": 10,
+                "default": 2,
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "turn_on_wall",
+                "type": "boolean",
+                "min": null,
+                "max": null,
+                "default": true,
+                "unit": null,
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "wander",
+        "name": "Блуждание",
+        "description": "Блуждание — модель поведения из классических 8-битных игр: Pac-Man (1980, Namco).",
+        "category": "movement",
+        "supported_engines": [
+            "static-screen",
+            "horizontal-scroll"
+        ],
+        "reference": "Pac-Man (1980, Namco)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "change_dir_ms",
+                "type": "number",
+                "min": 100,
+                "max": 10000,
+                "default": 1000,
+                "unit": "ms",
+                "options": null
+            },
+            {
+                "key": "turn_on_wall",
+                "type": "boolean",
+                "min": null,
+                "max": null,
+                "default": true,
+                "unit": null,
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "random_walk",
+        "name": "Случайное блуждание",
+        "description": "Случайное блуждание — модель поведения из классических 8-битных игр: Atic Atac (1983, Ultimate).",
+        "category": "movement",
+        "supported_engines": [
+            "static-screen"
+        ],
+        "reference": "Atic Atac (1983, Ultimate)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "change_dir_ms",
+                "type": "number",
+                "min": 100,
+                "max": 10000,
+                "default": 1000,
+                "unit": "ms",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "ghost_phase",
+        "name": "Проходит сквозь стены",
+        "description": "Проходит сквозь стены — модель поведения из классических 8-битных игр: Bubble Bobble (1986, Taito).",
+        "category": "movement",
+        "supported_engines": [
+            "static-screen"
+        ],
+        "reference": "Bubble Bobble (1986, Taito)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "phase_interval_ms",
+                "type": "number",
+                "min": 100,
+                "max": 10000,
+                "default": 2000,
+                "unit": "ms",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "ladder_user",
+        "name": "Использует лестницы",
+        "description": "Использует лестницы — модель поведения из классических 8-битных игр: Lode Runner (1983).",
+        "category": "movement",
+        "supported_engines": [
+            "static-screen",
+            "horizontal-scroll"
+        ],
+        "reference": "Lode Runner (1983)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "pathfinding",
+                "type": "enum",
+                "min": null,
+                "max": null,
+                "default": "greedy",
+                "unit": null,
+                "options": [
+                    "direct",
+                    "greedy",
+                    "astar"
+                ]
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "platform_edge_aware",
+        "name": "Учитывает края платформ",
+        "description": "Учитывает края платформ — модель поведения из классических 8-битных игр: Super Mario Bros. (1985).",
+        "category": "movement",
+        "supported_engines": [
+            "horizontal-scroll"
+        ],
+        "reference": "Super Mario Bros. (1985)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "turn_on_edge",
+                "type": "boolean",
+                "min": null,
+                "max": null,
+                "default": true,
+                "unit": null,
+                "options": null
+            },
+            {
+                "key": "ledge_jump_chance",
+                "type": "number",
+                "min": 0,
+                "max": 1,
+                "default": 0.3,
+                "unit": null,
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "jumper",
+        "name": "Прыгающий",
+        "description": "Прыгающий — модель поведения из классических 8-битных игр: Donkey Kong (1981, Nintendo).",
+        "category": "movement",
+        "supported_engines": [
+            "horizontal-scroll"
+        ],
+        "reference": "Donkey Kong (1981, Nintendo)",
+        "params": [
+            {
+                "key": "jump_power",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 1,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "jump_interval_ms",
+                "type": "number",
+                "min": 100,
+                "max": 10000,
+                "default": 1000,
+                "unit": "ms",
+                "options": null
+            },
+            {
+                "key": "horizontal_drift",
+                "type": "number",
+                "min": -2,
+                "max": 2,
+                "default": 0,
+                "unit": "tiles",
+                "options": null
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    },
+    {
+        "id": "mimic_player_mirror",
+        "name": "Зеркалит игрока",
+        "description": "Зеркалит игрока — модель поведения из классических 8-битных игр: Shadow of the Beast (1989, Psygnosis).",
+        "category": "movement",
+        "supported_engines": [
+            "static-screen",
+            "horizontal-scroll"
+        ],
+        "reference": "Shadow of the Beast (1989, Psygnosis)",
+        "params": [
+            {
+                "key": "speed",
+                "type": "number",
+                "min": 0.1,
+                "max": 3,
+                "default": 0.5,
+                "unit": "tiles/frame",
+                "options": null
+            },
+            {
+                "key": "axis",
+                "type": "enum",
+                "min": null,
+                "max": null,
+                "default": "both",
+                "unit": null,
+                "options": [
+                    "horizontal",
+                    "vertical",
+                    "both"
+                ]
+            }
+        ],
+        "custom": false,
+        "created_at": "2026-10-23T00:00:00Z",
+        "updated_at": "2026-10-23T00:00:00Z"
+    }
 ]
