@@ -85,11 +85,35 @@ final class GeometrySvgSanitizer
 
         $this->checkDimensions($root);
 
-        // libxml не даёт удалить xmlns:*-декларации через DOM API — убираем их регуляркой.
-        // В санитизированном дереве не остаётся элементов/атрибутов с префиксами, поэтому безопасно.
-        $root = new \DOMDocument();
-        $root->loadXML(preg_replace('/\sxmlns:[a-zA-Z0-9_-]+="[^"]*"/', '', $doc->saveXML($root)) ?? $doc->saveXML($root));
-        $svgRoot = $root->documentElement;
+        // libxml не даёт удалить xmlns:*-декларации через DOM API — убираем их регуляркой
+        // и перечитываем в ТОМ ЖЕ документе (importNode из другого документа вызвал бы
+        // "Wrong Document Error" при обходе). В sanitizing walk ниже все элементы
+        // с префиксами удаляются, поэтому декларации становятся безопасными.
+        $cleanXml = preg_replace('/\sxmlns:[a-zA-Z0-9_-]+="[^"]*"/', '', $doc->saveXML($doc->documentElement) ?: '') ?? '';
+        // Атрибуты с удалённых пространств имён (xlink:href и т.п.) теряют префикс при
+        // перечитывании — удаляем их явно, чтобы «ожившие» href не прошли дальше.
+        $cleanXml = preg_replace('/\s(?:href|base|arcrole|role|about)\s*=\s*"[^"]*"/i', ' ', $cleanXml) ?? $cleanXml;
+        // Если у корня не осталось ни одного пространства имён — фиксируем SVG-NS,
+        // иначе локальные имена перестанут совпадать с белым списком.
+        if (preg_match('/^(\s*<[a-zA-Z_][\w.-]*)/', $cleanXml, $m)
+            && !str_contains(substr($cleanXml, strlen($m[1])), ' xmlns=')) {
+            $cleanXml = preg_replace('/^(\s*<[a-zA-Z_][\w.-]*)/', '$1 xmlns="http://www.w3.org/2000/svg"', $cleanXml, 1) ?? $cleanXml;
+        }
+        $fresh = new \DOMDocument();
+        // Предупреждения libxml (например, неподключённый префикс xlink после вырезания
+        // декларации) не должны попадать в вывод: парсим с подавлением ошибок.
+        $prev2 = libxml_use_internal_errors(true);
+        $loaded = $fresh->loadXML('<?xml version="1.0"?>' . $cleanXml, LIBXML_NONET);
+        libxml_clear_errors();
+        libxml_use_internal_errors($prev2);
+        if (!$loaded || $fresh->documentElement === null) {
+            throw new SvgSanitizeException('Не удалось перечитать SVG после очистки деклараций');
+        }
+        // Переносим корень в исходный документ: единственный способ сохранить
+        // совместимость последующих saveXML($node) по всей обходной логике.
+        $imported = $doc->importNode($fresh->documentElement, true);
+        $doc->replaceChild($imported, $doc->documentElement);
+        $svgRoot = $doc->documentElement;
 
         $removed = [];
         $this->walk($svgRoot, $removed);
@@ -104,7 +128,7 @@ final class GeometrySvgSanitizer
         $this->fixUrlRefs($svgRoot, $gradientIds);
 
         // §4.6 сериализация: saveXML(root) без XML-декларации.
-        $sanitized = $root->saveXML($svgRoot);
+        $sanitized = $doc->saveXML($svgRoot);
         if ($sanitized === false) {
             throw new SvgSanitizeException('Ошибка сериализации SVG');
         }
