@@ -8,6 +8,7 @@ use App\Audit\Logger;
 use App\GenreService;
 use App\GameService;
 use App\Storage\FileStore;
+use App\Validation\CombatValidator;
 use App\Validation\SettingsValidator;
 
 /**
@@ -398,6 +399,338 @@ final class SettingsService
             }
         }
 
+        return $out;
+    }
+
+    // ==================== Блок 10: боевая система ====================
+
+    /**
+     * Сохранение player_attacks (ТЗ блок 10 §2.1–§2.2, валидация §6.1/§7).
+     * @param array<string,mixed> $input из формы (вложенные melee/ranged/stomp/special)
+     * @return array{ok:bool,errors:list<string>}
+     */
+    public function savePlayerAttacks(string $gameId, array $input): array
+    {
+        $ctx = $this->context($gameId);
+        if ($ctx === null) {
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
+        }
+        $engine = (string)($ctx['genre']['engine'] ?? '');
+        $legend = $this->games->effectiveLegend($ctx['game']);
+        $overrides = self::toArray($ctx['game']['engine_overrides'] ?? []);
+
+        $pa = self::normalizeAttacks($input);
+        $errors = CombatValidator::validatePlayerAttacks($pa);
+
+        // Кросс-проверки §6.1/§7 (по merged-картине controls игры)
+        $controls = (array)($ctx['game']['controls'] ?? []);
+        if (($pa['melee']['enabled'] ?? false) === true && (array)($controls['fire'] ?? []) === []) {
+            $errors[] = 'melee включён: действию «fire» должна быть назначена клавиша (вкладка «Управление»).';
+        }
+        if (($pa['ranged']['enabled'] ?? false) === true) {
+            $pe = (string)($pa['ranged']['projectile_emoji'] ?? '');
+            $el = $legend[$pe] ?? null;
+            if (!is_array($el) || ($el['role'] ?? '') !== 'projectile') {
+                $errors[] = sprintf('ranged включён: снаряд «%s» должен существовать в легенде с ролью projectile.', $pe);
+            } elseif ((float)($el['damage'] ?? 0) < 1) {
+                $errors[] = sprintf('ranged включён: снаряд «%s» должен иметь damage ≥ 1.', $pe);
+            }
+            if ((array)($controls['fire'] ?? []) === []) {
+                $errors[] = 'ranged включён: действию «fire» должна быть назначена клавиша.';
+            }
+        }
+        if (($pa['stomp']['enabled'] ?? false) === true) {
+            $movementType = (string)($overrides['movement_type'] ?? 'gravity');
+            if ($engine === 'vertical-scroll' || str_starts_with($movementType, 'top_down')) {
+                $errors[] = 'stomp доступен только для движков с гравитацией (static-screen/gravity, horizontal-scroll).';
+            }
+        }
+        if (($pa['special']['enabled'] ?? false) === true) {
+            $action = (string)($pa['special']['action'] ?? 'action');
+            if ((array)($controls[$action] ?? []) === []) {
+                $errors[] = sprintf('спецприём включён: действию «%s» должна быть назначена клавиша.', $action);
+            }
+            $recharge = $pa['special']['recharge_by_pickup'] ?? null;
+            if ($recharge !== null && $recharge !== '') {
+                $found = false;
+                foreach ($legend as $el2) {
+                    if (is_array($el2) && ($el2['role'] ?? '') === 'pickup' && (string)($el2['pickup_id'] ?? '') === (string)$recharge) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    $errors[] = sprintf('special.recharge_by_pickup: pickup_id «%s» не найден в легенде.', (string)$recharge);
+                }
+            }
+            if (($pa['special']['type'] ?? '') === 'time_stop' && !array_key_exists('freeze_duration_ms', $pa['special'])) {
+                $errors[] = 'special.type=time_stop: требуется freeze_duration_ms.';
+            }
+            if (($pa['special']['type'] ?? '') === 'shield' && !array_key_exists('shield_duration_ms', $pa['special'])) {
+                $errors[] = 'special.type=shield: требуется shield_duration_ms.';
+            }
+        }
+
+        if ($errors !== []) {
+            return ['ok' => false, 'errors' => $errors];
+        }
+
+        $old = self::toArray($overrides['player_attacks'] ?? []);
+        $changed = self::diffFields($old, $pa);
+        $this->mutate($gameId, static function (array &$game) use ($pa): void {
+            $ov = self::toArray($game['engine_overrides'] ?? []);
+            $ov['player_attacks'] = $pa;
+            $game['engine_overrides'] = $ov;
+            $game['updated_at'] = gmdate('Y-m-d\\TH:i:s\\Z');
+        });
+        $this->audit->log('game.player_attacks_update', $gameId, ['changed' => array_values(array_unique($changed))]);
+        return ['ok' => true, 'errors' => []];
+    }
+
+    /**
+     * Сохранение player (lives, health_max, invulnerability_ms, dodge, parry) — §2.3, §6.2.
+     * @return array{ok:bool,errors:list<string>}
+     */
+    public function savePlayer(string $gameId, array $input): array
+    {
+        $ctx = $this->context($gameId);
+        if ($ctx === null) {
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
+        }
+        $player = [];
+        foreach (['lives', 'health_max', 'invulnerability_ms'] as $f) {
+            if (array_key_exists($f, $input) && is_numeric($input[$f])) {
+                $player[$f] = (int)$input[$f];
+            }
+        }
+        foreach (['dodge', 'parry'] as $sub) {
+            $in = (array)($input[$sub] ?? []);
+            $obj = [];
+            if (array_key_exists('enabled', $in)) {
+                $obj['enabled'] = filter_var($in['enabled'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+            }
+            foreach (['duration_ms', 'invulnerability_ms', 'cooldown_ms', 'window_ms'] as $f) {
+                if (array_key_exists($f, $in) && is_numeric($in[$f])) {
+                    $obj[$f] = (int)$in[$f];
+                }
+            }
+            foreach (['action'] as $f) {
+                $v = trim((string)($in[$f] ?? ''));
+                if ($v !== '' && in_array($v, SettingsValidator::ACTIONS, true)) {
+                    $obj[$f] = $v;
+                }
+            }
+            if ($obj !== []) {
+                $player[$sub] = $obj;
+            }
+        }
+        // fuel-поля блока 9 сохраняем как есть, если прислали
+        foreach (['fuel_capacity', 'fuel_consumption_per_sec'] as $f) {
+            if (array_key_exists($f, $input) && is_numeric($input[$f])) {
+                $player[$f] = (float)$input[$f];
+            }
+        }
+
+        $errors = CombatValidator::validatePlayer($player);
+        $controls = (array)($ctx['game']['controls'] ?? []);
+        foreach (['dodge', 'parry'] as $sub) {
+            if (($player[$sub]['enabled'] ?? false) === true) {
+                $act = (string)($player[$sub]['action'] ?? ($sub === 'dodge' ? 'fire' : 'action'));
+                if ((array)($controls[$act] ?? []) === []) {
+                    $errors[] = sprintf('%s включено: действию «%s» должна быть назначена клавиша.', ucfirst($sub), $act);
+                }
+            }
+        }
+        if ($errors !== []) {
+            return ['ok' => false, 'errors' => $errors];
+        }
+
+        $overrides = self::toArray($ctx['game']['engine_overrides'] ?? []);
+        $old = self::toArray($overrides['player'] ?? []);
+        $changed = self::diffFields($old, $player);
+        $this->mutate($gameId, static function (array &$game) use ($player): void {
+            $ov = self::toArray($game['engine_overrides'] ?? []);
+            $ov['player'] = array_merge(self::toArray($ov['player'] ?? []), $player);
+            $game['engine_overrides'] = $ov;
+            $game['updated_at'] = gmdate('Y-m-d\\TH:i:s\\Z');
+        });
+        $this->audit->log('game.player_update', $gameId, ['changed' => array_values(array_unique($changed))]);
+        return ['ok' => true, 'errors' => []];
+    }
+
+    /**
+     * Сохранение scoring (§2.6, §6.3) + миграция старых player.score_on_* (§2.6 примечание).
+     * @return array{ok:bool,errors:list<string>}
+     */
+    public function saveScoring(string $gameId, array $input): array
+    {
+        $ctx = $this->context($gameId);
+        if ($ctx === null) {
+            return ['ok' => false, 'errors' => ['Игра не найдена.']];
+        }
+        $sc = [];
+        foreach (['on_enemy_kill' => [0, 100000], 'on_pickup' => [0, 1000]] as $f => [$min, $max]) {
+            if (array_key_exists($f, $input) && is_numeric($input[$f])) {
+                $sc[$f] = (int)$input[$f];
+            }
+        }
+        foreach (['combo', 'time_bonus'] as $sub) {
+            $in = (array)($input[$sub] ?? []);
+            $obj = [];
+            if (array_key_exists('enabled', $in)) {
+                $obj['enabled'] = filter_var($in['enabled'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+            }
+            foreach (['window_ms', 'base', 'per_second_remaining'] as $f) {
+                if (array_key_exists($f, $in) && is_numeric($in[$f])) {
+                    $obj[$f] = (int)$in[$f];
+                }
+            }
+            foreach (['multiplier_per_hit', 'max_multiplier'] as $f) {
+                if (array_key_exists($f, $in) && is_numeric($in[$f])) {
+                    $obj[$f] = (float)$in[$f];
+                }
+            }
+            if ($obj !== []) {
+                $sc[$sub] = $obj;
+            }
+        }
+        $errors = CombatValidator::validateScoring($sc);
+        if ($errors !== []) {
+            return ['ok' => false, 'errors' => $errors];
+        }
+
+        $overrides = self::toArray($ctx['game']['engine_overrides'] ?? []);
+        $old = self::toArray($overrides['scoring'] ?? []);
+        $changed = self::diffFields($old, $sc);
+        $this->mutate($gameId, static function (array &$game) use ($sc): void {
+            $ov = self::toArray($game['engine_overrides'] ?? []);
+            $ov['scoring'] = array_merge(self::toArray($ov['scoring'] ?? []), $sc);
+            // Миграция §2.6: старые player.score_on_* переносятся в scoring.on_* и удаляются.
+            $pl = self::toArray($ov['player'] ?? []);
+            foreach (['score_on_enemy_kill' => 'on_enemy_kill', 'score_on_pickup' => 'on_pickup'] as $oldKey => $newKey) {
+                if (array_key_exists($oldKey, $pl)) {
+                    if (!array_key_exists($newKey, $ov['scoring'])) {
+                        $ov['scoring'][$newKey] = $pl[$oldKey];
+                    }
+                    unset($pl[$oldKey]);
+                }
+            }
+            if ($pl !== []) {
+                $ov['player'] = $pl;
+            } else {
+                unset($ov['player']);
+            }
+            $game['engine_overrides'] = $ov;
+            $game['updated_at'] = gmdate('Y-m-d\\TH:i:s\\Z');
+        });
+        $this->audit->log('game.scoring_update', $gameId, ['changed' => array_values(array_unique($changed))]);
+        return ['ok' => true, 'errors' => []];
+    }
+
+    /**
+     * Нормализация формы player_attacks → схема §2.1 (только white-list полей).
+     * @param array<string,mixed> $input
+     * @return array<string,mixed>
+     */
+    public static function normalizeAttacks(array $input): array
+    {
+        $out = [];
+        $melee = (array)($input['melee'] ?? []);
+        if ($melee !== []) {
+            $m = [];
+            $m['enabled'] = filter_var($melee['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+            foreach (['damage', 'range_tiles', 'cooldown_ms', 'knockback_tiles', 'stun_ms'] as $f) {
+                if (array_key_exists($f, $melee) && is_numeric($melee[$f])) {
+                    $m[$f] = (int)$melee[$f];
+                }
+            }
+            if (isset($melee['shape']) && trim((string)$melee['shape']) !== '') {
+                $m['shape'] = trim((string)$melee['shape']);
+            }
+            $hits = array_values(array_filter(array_map('strval', (array)($melee['hits'] ?? [])), static fn ($h) => $h !== ''));
+            if ($hits !== []) {
+                $m['hits'] = $hits;
+            }
+            $out['melee'] = $m;
+        }
+        $ranged = (array)($input['ranged'] ?? []);
+        if ($ranged !== []) {
+            $r = [];
+            $r['enabled'] = filter_var($ranged['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+            $pe = trim((string)($ranged['projectile_emoji'] ?? ''));
+            if ($pe !== '') {
+                $r['projectile_emoji'] = $pe;
+            }
+            if (is_numeric($ranged['cooldown_ms'] ?? null)) {
+                $r['cooldown_ms'] = (int)$ranged['cooldown_ms'];
+            }
+            if (isset($ranged['direction']) && trim((string)$ranged['direction']) !== '') {
+                $r['direction'] = trim((string)$ranged['direction']);
+            }
+            $ammoIn = (array)($ranged['ammo'] ?? []);
+            if ($ammoIn !== []) {
+                $ammo = [];
+                $ammo['type'] = in_array((string)($ammoIn['type'] ?? ''), CombatValidator::AMMO_TYPES, true)
+                    ? (string)$ammoIn['type'] : 'infinite';
+                if (is_numeric($ammoIn['start'] ?? null)) {
+                    $ammo['start'] = (int)$ammoIn['start'];
+                }
+                if (is_numeric($ammoIn['max'] ?? null)) {
+                    $ammo['max'] = (int)$ammoIn['max'];
+                }
+                $r['ammo'] = $ammo;
+            }
+            $chargeIn = (array)($ranged['charge'] ?? []);
+            if ($chargeIn !== []) {
+                $ch = [];
+                $ch['enabled'] = filter_var($chargeIn['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+                if (is_numeric($chargeIn['charge_ms'] ?? null)) {
+                    $ch['charge_ms'] = (int)$chargeIn['charge_ms'];
+                }
+                if (is_numeric($chargeIn['damage_multiplier'] ?? null)) {
+                    $ch['damage_multiplier'] = (float)$chargeIn['damage_multiplier'];
+                }
+                $r['charge'] = $ch;
+            }
+            $out['ranged'] = $r;
+        }
+        $stomp = (array)($input['stomp'] ?? []);
+        if ($stomp !== []) {
+            $s = [];
+            $s['enabled'] = filter_var($stomp['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+            foreach (['damage', 'stun_ms'] as $f) {
+                if (is_numeric($stomp[$f] ?? null)) {
+                    $s[$f] = (int)$stomp[$f];
+                }
+            }
+            $morph = $stomp['morph_to'] ?? null;
+            $s['morph_to'] = ($morph === null || $morph === '') ? null : (string)$morph;
+            if (is_numeric($stomp['bounce_power'] ?? null)) {
+                $s['bounce_power'] = (float)$stomp['bounce_power'];
+            }
+            $out['stomp'] = $s;
+        }
+        $special = (array)($input['special'] ?? []);
+        if ($special !== []) {
+            $sp = [];
+            $sp['enabled'] = filter_var($special['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+            foreach (['type', 'action'] as $f) {
+                if (isset($special[$f]) && trim((string)$special[$f]) !== '') {
+                    $sp[$f] = trim((string)$special[$f]);
+                }
+            }
+            if (is_numeric($special['charges_max'] ?? null)) {
+                $sp['charges_max'] = (int)$special['charges_max'];
+            }
+            $rbp = $special['recharge_by_pickup'] ?? null;
+            $sp['recharge_by_pickup'] = ($rbp === null || $rbp === '') ? null : (string)$rbp;
+            foreach (['freeze_duration_ms', 'shield_duration_ms'] as $f) {
+                if (is_numeric($special[$f] ?? null)) {
+                    $sp[$f] = (int)$special[$f];
+                }
+            }
+            $out['special'] = $sp;
+        }
         return $out;
     }
 

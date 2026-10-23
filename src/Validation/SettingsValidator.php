@@ -4,13 +4,28 @@ declare(strict_types=1);
 
 namespace App\Validation;
 
+use App\Settings\SettingsService;
+
 /**
- * Валидация controls / sounds / engine_overrides (ТЗ блок 9 §7).
- * Только допустимые поля из белого списка §2.7; неизвестные отбрасываются (см. SettingsService).
+ * Валидация controls / sounds / engine_overrides (ТЗ блок 9 §7 + блок 10 §6, §7.3).
+ * Только допустимые поля из белого списка §2.7 (+ player_attacks/scoring блока 10);
+ * неизвестные отбрасываются (см. SettingsService).
  */
 final class SettingsValidator
 {
     public const ACTIONS = ['left', 'right', 'up', 'down', 'jump', 'fire', 'dig_left', 'dig_right', 'action', 'pause', 'start'];
+
+    /** Поля engine_overrides: блок 9 (§2.7) + блок 10 (player_attacks, scoring, player-расширение). */
+    public const OVERRIDE_FIELDS = [
+        // общие 9 (§2.7)
+        'speed_scale', 'sprite_flicker', 'sprite_flicker_intensity', 'input_responsiveness',
+        'sound_volume', 'sound_enabled', 'fps', 'show_hud', 'animation_speed_scale',
+        // группы/спецполя блока 9
+        'physics', 'combat', 'camera_mode', 'camera_lerp', 'scroll_direction', 'scroll_speed',
+        'world_generation', 'hole_duration_ms', 'trap_duration_ms', 'movement_type', 'view_mode', 'player',
+        // блок 10
+        'player_attacks', 'scoring',
+    ];
 
     public const KEY_CODE_RE = '/^(Arrow(Up|Down|Left|Right)|Key[A-Z]|Digit[0-9]|Space|Escape|Enter|Tab|Backquote|Minus|Equal|BracketLeft|BracketRight|Backslash|Semicolon|Quote|Comma|Period|Slash|(Shift|Control|Alt|Meta)(Left|Right)|F([1-9]|1[0-2])|Numpad[0-9])$/';
 
@@ -195,6 +210,23 @@ final class SettingsValidator
             }
         }
 
+        // player_attacks (блок 10 §2.7): валидация по схеме CombatValidator
+        if (array_key_exists('player_attacks', $overrides)) {
+            if (!is_array($overrides['player_attacks'])) {
+                $errors[] = 'player_attacks: ожидается объект.';
+            } else {
+                $errors = array_merge($errors, CombatValidator::validatePlayerAttacks($overrides['player_attacks']));
+            }
+        }
+        // scoring (блок 10 §2.6)
+        if (array_key_exists('scoring', $overrides)) {
+            if (!is_array($overrides['scoring'])) {
+                $errors[] = 'scoring: ожидается объект.';
+            } else {
+                $errors = array_merge($errors, CombatValidator::validateScoring($overrides['scoring']));
+            }
+        }
+
         // Камера и скролл
         if (array_key_exists('camera_mode', $overrides)) $enum('camera_mode', $overrides['camera_mode'], ['follow', 'room', 'fixed']);
         if (array_key_exists('camera_lerp', $overrides)) $num('camera_lerp', $overrides['camera_lerp'], 0.05, 0.5);
@@ -208,18 +240,12 @@ final class SettingsValidator
         if (array_key_exists('movement_type', $overrides)) $enum('movement_type', $overrides['movement_type'], ['gravity', 'top_down_4dir', 'top_down_8dir', 'top_down_4dir_no_diag']);
         if (array_key_exists('view_mode', $overrides)) $enum('view_mode', $overrides['view_mode'], ['side', 'top']);
 
-        // Топливо (vertical-scroll)
+        // player (блок 9: топливо; блок 10 §2.3: lives/health_max/dodge/parry)
         if (array_key_exists('player', $overrides)) {
             if (!is_array($overrides['player'])) {
                 $errors[] = 'player: ожидается объект.';
             } else {
-                $pl = $overrides['player'];
-                if (array_key_exists('fuel_capacity', $pl) && (!is_numeric($pl['fuel_capacity']) || (float)$pl['fuel_capacity'] < 0 || (float)$pl['fuel_capacity'] > 1000)) {
-                    $errors[] = 'player.fuel_capacity: 0–1000.';
-                }
-                if (array_key_exists('fuel_consumption_per_sec', $pl) && (!is_numeric($pl['fuel_consumption_per_sec']) || (float)$pl['fuel_consumption_per_sec'] < 0 || (float)$pl['fuel_consumption_per_sec'] > 20)) {
-                    $errors[] = 'player.fuel_consumption_per_sec: 0.0–20.0.';
-                }
+                $errors = array_merge($errors, CombatValidator::validatePlayer($overrides['player']));
             }
         }
 
@@ -232,6 +258,104 @@ final class SettingsValidator
             }
             if ($mt === 'gravity' && $vm !== 'side') {
                 $errors[] = 'Согласованность: movement_type «gravity» требует view_mode «side».';
+            }
+        }
+
+        // Блок 10 §7.3: stomp несовместим с top_down_* (гравитация обязательна)
+        if (($overrides['player_attacks']['stomp']['enabled'] ?? false) === true
+            && is_string($mt) && str_starts_with($mt, 'top_down')) {
+            $errors[] = 'Согласованность: player_attacks.stomp несовместим с movement_type «' . $mt . '» (нужна гравитация).';
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Кросс-проверки engine_overrides × controls/legend (ТЗ блок 10 §7.3).
+     * Вызывается из SettingsService::saveOverrides(); ошибки блокируют сохранение.
+     * @param array<string,mixed> $overrides нормализованные поля движка
+     * @param array<string,mixed> $controls merged-назначения игры
+     * @param array<string,mixed> $legend эффективная легенда игры
+     * @param string $engine движок жанра
+     * @return list<string>
+     */
+    public static function validateOverridesConsistency(array $overrides, array $controls, array $legend, string $engine): array
+    {
+        $errors = [];
+        $pa = $overrides['player_attacks'] ?? null;
+        if (!is_array($pa)) {
+            return $errors;
+        }
+
+        $hasKey = static fn (string $action): bool => (array)($controls[$action] ?? []) !== [];
+        $pickupIds = [];
+        foreach ($legend as $el) {
+            if (is_array($el) && ($el['role'] ?? '') === 'pickup' && (string)($el['pickup_id'] ?? '') !== '') {
+                $pickupIds[(string)$el['pickup_id']] = true;
+            }
+        }
+
+        $melee = (array)($pa['melee'] ?? []);
+        if (($melee['enabled'] ?? false) === true && !$hasKey('fire')) {
+            $errors[] = 'player_attacks.melee включён, но действию «fire» не назначена клавиша.';
+        }
+
+        $ranged = (array)($pa['ranged'] ?? []);
+        if (($ranged['enabled'] ?? false) === true) {
+            if (!$hasKey('fire')) {
+                $errors[] = 'player_attacks.ranged включён, но действию «fire» не назначена клавиша.';
+            }
+            $pe = (string)($ranged['projectile_emoji'] ?? '');
+            $el = is_string($pe) ? ($legend[$pe] ?? null) : null;
+            if (!is_array($el) || ($el['role'] ?? '') !== 'projectile') {
+                $errors[] = sprintf('player_attacks.ranged: снаряд «%s» должен существовать в легенде с ролью projectile.', $pe);
+            } elseif ((float)($el['damage'] ?? 0) < 1) {
+                $errors[] = sprintf('player_attacks.ranged: снаряд «%s» должен иметь damage ≥ 1.', $pe);
+            }
+        }
+
+        $stomp = (array)($pa['stomp'] ?? []);
+        if (($stomp['enabled'] ?? false) === true) {
+            $mt = (string)($overrides['movement_type'] ?? 'gravity');
+            if ($engine === 'vertical-scroll' || str_starts_with($mt, 'top_down')) {
+                $errors[] = 'player_attacks.stomp доступен только движкам с гравитацией (static-screen/gravity, horizontal-scroll).';
+            }
+            $morph = $stomp['morph_to'] ?? null;
+            if ($morph !== null && $morph !== '') {
+                $mel = $legend[(string)$morph] ?? null;
+                if (!is_array($mel) || ($mel['role'] ?? '') !== 'mob') {
+                    $errors[] = sprintf('player_attacks.stomp.morph_to: «%s» не является mob легенды.', (string)$morph);
+                }
+            }
+        }
+
+        $special = (array)($pa['special'] ?? []);
+        if (($special['enabled'] ?? false) === true) {
+            $act = (string)($special['action'] ?? 'action');
+            if (!$hasKey($act)) {
+                $errors[] = sprintf('player_attacks.special включён, но действию «%s» не назначена клавиша.', $act);
+            }
+            $recharge = $special['recharge_by_pickup'] ?? null;
+            if ($recharge !== null && $recharge !== '' && !isset($pickupIds[(string)$recharge])) {
+                $errors[] = sprintf('player_attacks.special.recharge_by_pickup: pickup_id «%s» не найден в легенде.', (string)$recharge);
+            }
+            if ((string)($special['type'] ?? '') === 'time_stop' && !array_key_exists('freeze_duration_ms', $special)) {
+                $errors[] = 'player_attacks.special: type=time_stop требует freeze_duration_ms.';
+            }
+            if ((string)($special['type'] ?? '') === 'shield' && !array_key_exists('shield_duration_ms', $special)) {
+                $errors[] = 'player_attacks.special: type=shield требует shield_duration_ms.';
+            }
+        }
+
+        // dodge / parry (§2.3) — клавиша действия обязательна при enabled
+        $player = (array)($overrides['player'] ?? []);
+        foreach (['dodge' => 'fire', 'parry' => 'action'] as $sub => $defaultAction) {
+            $sec = (array)($player[$sub] ?? []);
+            if (($sec['enabled'] ?? false) === true) {
+                $act = (string)($sec['action'] ?? $defaultAction);
+                if (!$hasKey($act)) {
+                    $errors[] = sprintf('player.%s включено, но действию «%s» не назначена клавиша.', $sub, $act);
+                }
             }
         }
 
