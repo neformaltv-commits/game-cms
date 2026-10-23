@@ -1,0 +1,103 @@
+{
+  "id": "genre-riverraid",
+  "slug": "vertical-shooter",
+  "name": "Вертикальные скролл-шутеры",
+  "engine": "vertical-scroll",
+  "sort_order": 50,
+  "engine_config": {
+    "tile_size": 8,
+    "scroll_direction": "up",
+    "scroll_speed": 2.0,
+    "physics": {
+      "move_speed": 3.0,
+      "vertical_move_speed": 2.0,
+      "vertical_range": 5,
+      "boundary_behavior": "clamp"
+    },
+    "combat": {
+      "player_fire_rate_ms": 150,
+      "invulnerability_ms": 1000,
+      "enemy_contact_damage": 1
+    },
+    "player": {
+      "lives": 3,
+      "health_max": 1,
+      "fuel_capacity": 100,
+      "fuel_consumption_per_sec": 1.5,
+      "score_on_enemy_kill": 100
+    },
+    "speed_scale": 1.0,
+    "sprite_flicker": false,
+    "sprite_flicker_intensity": 0.1,
+    "input_responsiveness": 1.0,
+    "sound_volume": 0.03,
+    "sound_enabled": true,
+    "fps": 60,
+    "show_hud": true,
+    "animation_speed_scale": 1.0,
+    "level_rules": {
+      "requires_start": true,
+      "requires_exit": false,
+      "min_pickups": 0
+    },
+    "default_controls": {
+      "left": [
+        "ArrowLeft",
+        "KeyA"
+      ],
+      "right": [
+        "ArrowRight",
+        "KeyD"
+      ],
+      "up": [
+        "ArrowUp",
+        "KeyW"
+      ],
+      "down": [
+        "ArrowDown",
+        "KeyS"
+      ],
+      "fire": [
+        "Space",
+        "KeyZ"
+      ],
+      "pause": [
+        "Escape"
+      ],
+      "start": [
+        "Enter"
+      ]
+    },
+    "default_sounds": []
+  },
+  "default_legend": {
+    "🌊": {
+      "role": "background",
+      "name": "Вода",
+      "walkable": true
+    },
+    "🏞": {
+      "role": "obstacle",
+      "name": "Берег",
+      "solid": true
+    },
+    "✈️": {
+      "role": "start",
+      "name": "Самолёт"
+    },
+    "💥": {
+      "role": "projectile",
+      "name": "Пуля",
+      "speed": 6,
+      "damage": 1,
+      "lifetime_ms": 2000
+    },
+    "⛽": {
+      "role": "pickup",
+      "name": "Заправка",
+      "pickup_id": "fuel",
+      "effect": "ammo",
+      "value": 50
+    }
+  }
+}

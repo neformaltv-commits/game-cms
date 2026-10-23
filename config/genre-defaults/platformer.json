@@ -1,0 +1,101 @@
+{
+  "id": "genre-platformer",
+  "slug": "platformer",
+  "name": "Платформеры",
+  "engine": "horizontal-scroll",
+  "sort_order": 30,
+  "engine_config": {
+    "tile_size": 8,
+    "camera_mode": "follow",
+    "camera_lerp": 0.15,
+    "physics": {
+      "gravity": 0.35,
+      "move_speed": 1.6,
+      "jump_power": -5.2,
+      "max_fall_speed": 8.0,
+      "coyote_time_ms": 100,
+      "jump_buffer_ms": 150,
+      "variable_jump": true,
+      "double_jump": false,
+      "air_control": 0.8
+    },
+    "combat": {
+      "invulnerability_ms": 1000,
+      "enemy_contact_damage": 1
+    },
+    "player": {
+      "lives": 3,
+      "health_max": 1,
+      "score_on_pickup": 10,
+      "score_on_enemy_kill": 100
+    },
+    "speed_scale": 1.0,
+    "sprite_flicker": false,
+    "sprite_flicker_intensity": 0.1,
+    "input_responsiveness": 1.0,
+    "sound_volume": 0.03,
+    "sound_enabled": true,
+    "fps": 60,
+    "show_hud": true,
+    "animation_speed_scale": 1.0,
+    "level_rules": {
+      "requires_start": true,
+      "requires_finish": true,
+      "min_width_tiles": 32,
+      "max_width_tiles": 800
+    },
+    "default_controls": {
+      "left": [
+        "ArrowLeft",
+        "KeyA"
+      ],
+      "right": [
+        "ArrowRight",
+        "KeyD"
+      ],
+      "up": [
+        "ArrowUp",
+        "KeyW"
+      ],
+      "down": [
+        "ArrowDown",
+        "KeyS"
+      ],
+      "jump": [
+        "Space",
+        "KeyZ"
+      ],
+      "fire": [
+        "KeyX"
+      ],
+      "pause": [
+        "Escape"
+      ],
+      "start": [
+        "Enter"
+      ]
+    },
+    "default_sounds": []
+  },
+  "default_legend": {
+    "🟫": {
+      "role": "obstacle",
+      "name": "Земля",
+      "solid": true
+    },
+    "🟩": {
+      "role": "background",
+      "name": "Трава",
+      "walkable": true
+    },
+    "🏃": {
+      "role": "start",
+      "name": "Игрок"
+    },
+    "🚩": {
+      "role": "exit",
+      "name": "Флаг",
+      "mode": "touch"
+    }
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "id": "genre-loderunner",
+  "slug": "lode-runner",
+  "name": "Lode Runner-подобные",
+  "description": "Одноэкранные головоломки с копанием ям, сбором золота и лестницами",
+  "engine": "static-screen",
+  "sort_order": 10,
+  "created_at": "2026-10-21T10:00:00Z",
+  "updated_at": "2026-10-21T10:00:00Z",
+  "engine_config": {
+    "tile_size": 8,
+    "movement_type": "gravity",
+    "view_mode": "side",
+    "physics": {
+      "gravity": 0.35,
+      "move_speed": 1.6,
+      "jump_power": 0,
+      "climb_speed": 1.2,
+      "swim_speed": 1.0,
+      "coyote_time_ms": 100,
+      "jump_buffer_ms": 150,
+      "diagonal_movement": false,
+      "max_fall_speed": 8.0
+    },
+    "combat": {
+      "invulnerability_ms": 1000,
+      "player_melee_cooldown_ms": 300,
+      "enemy_contact_damage": 1
+    },
+    "player": {
+      "lives": 3,
+      "health_max": 1,
+      "score_on_pickup": 10,
+      "score_on_enemy_kill": 100
+    },
+    "hole_duration_ms": 3000,
+    "trap_duration_ms": 2000,
+    "speed_scale": 1.0,
+    "sprite_flicker": false,
+    "sprite_flicker_intensity": 0.1,
+    "input_responsiveness": 1.0,
+    "sound_volume": 0.03,
+    "sound_enabled": true,
+    "fps": 60,
+    "show_hud": true,
+    "animation_speed_scale": 1.0,
+    "level_rules": {
+      "requires_start": true,
+      "requires_exit": true,
+      "min_pickups": 1
+    },
+    "default_controls": {
+      "left": [
+        "ArrowLeft",
+        "KeyA"
+      ],
+      "right": [
+        "ArrowRight",
+        "KeyD"
+      ],
+      "up": [
+        "ArrowUp",
+        "KeyW"
+      ],
+      "down": [
+        "ArrowDown",
+        "KeyS"
+      ],
+      "dig_left": [
+        "KeyZ"
+      ],
+      "dig_right": [
+        "KeyX"
+      ],
+      "pause": [
+        "Escape"
+      ],
+      "start": [
+        "Enter"
+      ]
+    },
+    "default_sounds": [
+      {
+        "event": "dig",
+        "wave": "square",
+        "frequency_hz": 440,
+        "duration_ms": 50,
+        "volume": 0.03,
+        "envelope": "decay"
+      },
+      {
+        "event": "pickup",
+        "wave": "square",
+        "frequency_hz": 1320,
+        "duration_ms": 60,
+        "volume": 0.04,
+        "envelope": "pluck"
+      },
+      {
+        "event": "hit",
+        "wave": "square",
+        "frequency_hz": 220,
+        "duration_ms": 80,
+        "volume": 0.04,
+        "envelope": "decay"
+      },
+      {
+        "event": "death",
+        "wave": "sawtooth",
+        "frequency_hz": 220,
+        "frequency_end_hz": 55,
+        "duration_ms": 400,
+        "volume": 0.06,
+        "envelope": "linear"
+      },
+      {
+        "event": "win",
+        "wave": "square",
+        "frequency_hz": 1760,
+        "duration_ms": 250,
+        "volume": 0.05,
+        "envelope": "pluck"
+      }
+    ]
+  },
+  "default_legend": {
+    "🧱": {
+      "role": "obstacle",
+      "name": "Кирпич",
+      "solid": true,
+      "diggable": true
+    },
+    "⬜": {
+      "role": "obstacle",
+      "name": "Бетон",
+      "solid": true
+    },
+    "🪜": {
+      "role": "obstacle",
+      "name": "Лестница",
+      "climbable": true
+    },
+    "〰️": {
+      "role": "obstacle",
+      "name": "Перекладина",
+      "hangable": true
+    },
+    "🏃": {
+      "role": "start",
+      "name": "Игрок"
+    },
+    "💰": {
+      "role": "pickup",
+      "name": "Золото",
+      "pickup_id": "gold",
+      "effect": "score",
+      "value": 10
+    },
+    "🚪": {
+      "role": "exit",
+      "name": "Выход",
+      "mode": "after_all"
+    }
+  }
+}
