@@ -158,11 +158,12 @@ class FileStore
 
     /**
      * Транзакция: читает, применяет $mutator, пишет (ТЗ 2.4).
+     * Возвращает результат мутатора (например, назначенный слот).
      * $mutator принимает &$data; возврат false — не сохранять.
      * Блокировка удерживается на всё время мутации; внутренняя запись
      * выполняется без повторного захвата flock (иначе взаимоблокировка).
      */
-    public function mutate(string $relativePath, callable $mutator): void
+    public function mutate(string $relativePath, callable $mutator): mixed
     {
         $lock = $this->openLock($relativePath);
         try {
@@ -172,10 +173,12 @@ class FileStore
             // Читаем напрямую: public read() захватил бы LOCK_SH на том же
             // дескрипторе файла и заблокировался бы на ожидание нашего LOCK_EX.
             $data = $this->readLocked($relativePath);
-            if ($mutator($data) !== false) {
+            $result = $mutator($data);
+            if ($result !== false) {
                 $this->writeLocked($relativePath, $data);
             }
             flock($lock, LOCK_UN);
+            return $result;
         } finally {
             fclose($lock);
         }

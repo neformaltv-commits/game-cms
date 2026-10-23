@@ -57,10 +57,11 @@ final class RasterTest extends \TestCase
         imagedestroy($img);
         if ($withMetadata) {
             // Вставляем корректный tEXt-чанк (метаданные) перед IEND:
-            // length(4) + "tEXt" + keyword + \0 + text + CRC32(type+data).
+            // длина(4) + "tEXt" + keyword + \0 + text + CRC32(type+data),
+            // где "tEXt" входит в данные чанка и в расчёт CRC.
             $png = file_get_contents($path);
-            $data = 'tEXt' . "Comment\x00made-by-test";
-            $chunk = pack('N', strlen($data)) . $data . pack('N', crc32($data));
+            $typeData = 'tEXt' . "Comment\x00made-by-test";
+            $chunk = pack('N', strlen($typeData)) . $typeData . pack('N', crc32($typeData));
             $iendPos = strpos($png, 'IEND');
             $this->assertTrue($iendPos !== false);
             $png = substr($png, 0, $iendPos - 4) . $chunk . substr($png, $iendPos - 4);
