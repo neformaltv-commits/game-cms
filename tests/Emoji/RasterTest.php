@@ -56,17 +56,27 @@ final class RasterTest extends \TestCase
         imagepng($img, $path);
         if ($withMetadata) {
             // Вставляем корректный tEXt-чанк (метаданные) перед IEND по спецификации PNG:
-            //   длина(4, big-endian) = len(type + data), type="tEXt", data="Comment\0...",
-            //   CRC(4) = crc32(type + data).
-            // Точка вставки — за 12 байт до маркера "IEND" (это начало чанка IEND:
-            // 4 длины + 4 типа + 4 CRC). Хрупко и зависит от конкретного кодера GD,
-            // поэтому ниже — самопроверка фикстуры через imagecreatefrompng().
+            //   длина(4, big-endian) = len(data), type="tEXt", data="Comment\0...",
+            //   CRC(4) = crc32(type + data).  <-- в CRC входит тип чанка!
+            // Точку вставки ищем не по строке "IEND" (она может встретиться внутри IDAT),
+            // а обходом чанков по заголовкам. Ниже — самопроверка фикстуры через GD.
             $png = file_get_contents($path);
-            $typeData = 'tEXt' . "Comment\x00made-by-test";
-            $chunk = pack('N', strlen($typeData)) . $typeData . pack('N', crc32($typeData));
-            $iendPos = strpos($png, 'IEND');
-            $this->assertTrue($iendPos !== false);
-            $insertAt = $iendPos - 12;
+            $insertAt = null;
+            $p = 8; // после сигнатуры
+            $len = strlen($png);
+            while ($p + 8 <= $len) {
+                $chunkLen = unpack('N', substr($png, $p, 4))[1];
+                $type = substr($png, $p + 4, 4);
+                if ($type === 'IEND') {
+                    $insertAt = $p;
+                    break;
+                }
+                $p += 8 + $chunkLen + 4;
+            }
+            $this->assertTrue($insertAt !== null, 'в фикстуре не найден чанк IEND');
+            $textData = "Comment\x00made-by-test";
+            $chunk = pack('N', strlen($textData)) . 'tEXt' . $textData
+                . pack('N', crc32('tEXt' . $textData));
             $png = substr($png, 0, $insertAt) . $chunk . substr($png, $insertAt);
             file_put_contents($path, $png);
             // самопроверка фикстуры: файл обязан читаться GD, иначе тест не о чём
