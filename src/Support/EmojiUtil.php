@@ -93,14 +93,15 @@ final class EmojiUtil
     }
 
     /**
-     * Разбор строки сетки уровня на массив emoji-кластеров (ячейки разделены пробелами).
-     * @return list<string>|null null — если встречается не-emoji токен
+     * Разбор строки сетки уровня на массив ячеек (кластеры разделены пробелами).
+     * Допустимы одиночные emoji-кластеры и «.» — стандартное обозначение пустой клетки.
+     * @return list<string>|null null — если встречается невалидный токен
      */
     public static function splitCells(string $row): ?array
     {
         $tokens = preg_split('/\s+/u', trim($row), -1, PREG_SPLIT_NO_EMPTY) ?: [];
         foreach ($tokens as $t) {
-            if (!self::isSingleEmoji($t)) {
+            if ($t !== '.' && !self::isSingleEmoji($t)) {
                 return null;
             }
         }

@@ -61,6 +61,13 @@ final class LevelService
                 'time_limit_s' => null,
                 'created_at' => gmdate('Y-m-d\TH:i:s\Z'),
             ];
+            // Пустые клетки («.») не входят в легенду — добавляем их как background-элемент
+            // самой игры (ТЗ §3.1: legend игры переопределяет/дополняет легенду жанра).
+            if ($fill === '.' && !array_key_exists('.', (array)$game['legend'])) {
+                $legend = (array)$game['legend'];
+                $legend['.'] = ['role' => 'background', 'name' => 'Пусто'];
+                $game['legend'] = $legend;
+            }
             $levels[] = $level;
             $result = ['ok' => true, 'errors' => [], 'level' => $level];
             return true;
