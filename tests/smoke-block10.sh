@@ -31,7 +31,7 @@ RES=$(curl -s -o /dev/null -w '%{http_code}' -b "$CJ" -c "$CJ" \
   --data-urlencode "genre_id=$GENRE_ID" \
   --data-urlencode "_csrf=$T" "$BASE/admin/games.php")
 check "POST create game -> 302" 302 "$RES"
-GAME_ID=$(php -r '$fs=glob("data/games/*.json");foreach($fs as $f){$d=json_decode(file_get_contents($f),true);if(($d["title"]??")==="Smoke Block10 Game"){echo $d["id"];exit;}}')
+GAME_ID=$(php -r "\$fs=glob('data/games/*.json');foreach(\$fs as \$f){\$d=json_decode(file_get_contents(\$f),true);if((\$d['title']??'')==='Smoke Block10 Game'){echo \$d['id'];exit;}}")
 if [ -z "$GAME_ID" ]; then echo "FAIL: игра не найдена"; exit 1; fi
 T=$(page_token "$BASE/admin/game-edit.php?id=$GAME_ID")
 curl -s -o /dev/null -b "$CJ" -c "$CJ" \
@@ -49,6 +49,17 @@ CODE=$(curl -s -o /dev/null -w '%{http_code}' "$BASE/admin/game-combat.php?id=$G
 check "GET game-combat без сессии -> 302" 302 "$CODE"
 
 echo "== 4. Сохранение атак игрока (melee включён) =="
+# назначаем клавишу действию fire (жанр loderunner её не имеет по умолчанию) — иначе melee запрещён валидатором
+T=$(page_token "$BASE/admin/game-settings.php?id=$GAME_ID&tab=controls")
+RES=$(curl -s -o /dev/null -w '%{http_code}' -b "$CJ" -c "$CJ" \
+  --data-urlencode "action=save-controls" --data-urlencode "game_id=$GAME_ID" --data-urlencode "tab=controls" \
+  --data-urlencode "controls[left][]=ArrowLeft" --data-urlencode "controls[right][]=ArrowRight" \
+  --data-urlencode "controls[up][]=ArrowUp" --data-urlencode "controls[down][]=ArrowDown" \
+  --data-urlencode "controls[dig_left][]=KeyA" --data-urlencode "controls[dig_right][]=KeyD" \
+  --data-urlencode "controls[pause][]=KeyP" --data-urlencode "controls[start][]=Enter" \
+  --data-urlencode "controls[fire][]=Space" \
+  --data-urlencode "_csrf=$T" "$BASE/admin/game-settings.php")
+check "POST save-controls (fire=Space) -> 302" 302 "$RES"
 T=$(page_token "$BASE/admin/game-combat.php?id=$GAME_ID&tab=attacks")
 RES=$(curl -s -o /dev/null -w '%{http_code}' -b "$CJ" -c "$CJ" \
   --data-urlencode "action=save-attacks" --data-urlencode "game_id=$GAME_ID" --data-urlencode "tab=attacks" \
@@ -64,10 +75,14 @@ check "melee.enabled записан" "on" "$MELEE"
 
 echo "== 5. Ошибка валидации: melee без клавиши fire — не сохраняется =="
 GAME_BEFORE=$(md5sum "data/games/$GAME_ID.json" | cut -d' ' -f1)
-# очищаем controls (пустой POST = все действия без клавиш; saveControls допускает это)
+# снимаем клавишу с fire (сохраняем controls без fire) — melee тогда отклоняется валидатором
 T=$(page_token "$BASE/admin/game-settings.php?id=$GAME_ID&tab=controls")
 curl -s -o /dev/null -b "$CJ" -c "$CJ" \
   --data-urlencode "action=save-controls" --data-urlencode "game_id=$GAME_ID" --data-urlencode "tab=controls" \
+  --data-urlencode "controls[left][]=ArrowLeft" --data-urlencode "controls[right][]=ArrowRight" \
+  --data-urlencode "controls[up][]=ArrowUp" --data-urlencode "controls[down][]=ArrowDown" \
+  --data-urlencode "controls[dig_left][]=KeyA" --data-urlencode "controls[dig_right][]=KeyD" \
+  --data-urlencode "controls[pause][]=KeyP" --data-urlencode "controls[start][]=Enter" \
   --data-urlencode "_csrf=$T" "$BASE/admin/game-settings.php"
 T=$(page_token "$BASE/admin/game-combat.php?id=$GAME_ID&tab=attacks")
 BODY=$(curl -s -L -b "$CJ" -c "$CJ" \
@@ -99,7 +114,7 @@ RES=$(curl -s -o /dev/null -w '%{http_code}' -b "$CJ" -c "$CJ" \
   --data-urlencode "trigger[name]=Second" \
   --data-urlencode "trigger[enabled]=1" --data-urlencode "trigger[once]=1" \
   --data-urlencode "trigger[when][type]=pickup_count" \
-  --data-urlencode "trigger[when][pickup_id]=coins" \
+  --data-urlencode "trigger[when][pickup_id]=gold" \
   --data-urlencode "trigger[when][count]=2" \
   --data-urlencode "trigger[then][0][type]=show_message" \
   --data-urlencode "trigger[then][0][text]=Hello" \
@@ -111,7 +126,7 @@ IDS=$(php -r "(\$g=json_decode(file_get_contents(\"data/games/$GAME_ID.json\"),t
 case "$IDS" in trig-001*trig-002*) echo "PASS: id последовательны ($IDS)";; *) echo "FAIL: id триггеров: $IDS"; fail=1;; esac
 
 echo "== 7. Аудит level.trigger_create =="
-AUD=$(grep -c "level.trigger_create" data/audit/$(ls data/audit | tail -1) 2>/dev/null || echo 0)
+AUD=$(grep -c "level.trigger_create" data/audit.log 2>/dev/null || echo 0)
 check "записи level.trigger_create в аудите (>0)" 1 "$([ "$AUD" -gt 0 ] && echo 1 || echo 0)"
 
 echo "== 8. Условия победы/поражения =="
