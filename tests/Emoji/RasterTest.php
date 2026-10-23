@@ -54,19 +54,27 @@ final class RasterTest extends \TestCase
         imagesetpixel($img, (int)($w / 2), (int)($h / 2), $red);
         $path = $this->tmp . '/src.png';
         imagepng($img, $path);
-        imagedestroy($img);
         if ($withMetadata) {
-            // Вставляем корректный tEXt-чанк (метаданные) перед IEND:
-            // длина(4) + "tEXt" + keyword + \0 + text + CRC32(type+data),
-            // где "tEXt" входит в данные чанка и в расчёт CRC.
+            // Вставляем корректный tEXt-чанк (метаданные) перед IEND по спецификации PNG:
+            //   длина(4, big-endian) = len(type + data), type="tEXt", data="Comment\0...",
+            //   CRC(4) = crc32(type + data).
+            // Точка вставки — за 12 байт до маркера "IEND" (это начало чанка IEND:
+            // 4 длины + 4 типа + 4 CRC). Хрупко и зависит от конкретного кодера GD,
+            // поэтому ниже — самопроверка фикстуры через imagecreatefrompng().
             $png = file_get_contents($path);
             $typeData = 'tEXt' . "Comment\x00made-by-test";
             $chunk = pack('N', strlen($typeData)) . $typeData . pack('N', crc32($typeData));
             $iendPos = strpos($png, 'IEND');
             $this->assertTrue($iendPos !== false);
-            $png = substr($png, 0, $iendPos - 4) . $chunk . substr($png, $iendPos - 4);
+            $insertAt = $iendPos - 12;
+            $png = substr($png, 0, $insertAt) . $chunk . substr($png, $insertAt);
             file_put_contents($path, $png);
+            // самопроверка фикстуры: файл обязан читаться GD, иначе тест не о чём
+            $fixed = @imagecreatefrompng($path);
+            $this->assertTrue($fixed !== false, 'фикстура PNG повреждена');
+            imagedestroy($fixed);
         }
+        imagedestroy($img);
         return $path;
     }
 
