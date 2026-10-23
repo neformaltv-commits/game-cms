@@ -212,6 +212,7 @@ foreach ($controls as $act => $keys) {
 admin_header('Настройки игры: ' . $game['title'], 'games');
 ?>
 <h2><?= e($game['title']) ?> — движение/звук/настройки</h2>
+<p><a href="games.php">← Все игры</a> | <a href="game-edit.php?id=<?= e($game['id']) ?>">Редактор уровней</a> | <a href="game-combat.php?id=<?= e($game['id']) ?>">Бой и триггеры</a></p>
 <p>Движок: <b><?= e($engine) ?></b> (жанр: <?= e((string)($genre['name'] ?? $game['genre_id'])) ?>)</p>
 
 <nav class="tabs">
