@@ -44,6 +44,10 @@ function services(?string $root = null): array
     $emojiBank = new \App\Emoji\EmojiBankService($store, $audit, $config['media_dir']);
     $aiModels = new \App\Library\LibraryService($store, $audit, \App\Library\LibraryService::KIND_AI);
     $patterns = new \App\Library\LibraryService($store, $audit, \App\Library\LibraryService::KIND_PATTERN);
+    $legendValidator = new \App\Validation\LegendValidator($aiModels, $patterns);
+    $gameValidator = new \App\Validation\GameValidator($genres, $categories, $legendValidator, $store, $config['media_dir']);
+    $games = new GameService($store, $audit, $genres, $gameValidator, $config['media_dir']);
+    $levels = new LevelService($store, $audit, $games, $genres, $legendValidator);
 
-    return compact('config', 'store', 'audit', 'throttle', 'auth', 'limiter', 'genres', 'categories', 'references', 'emojiBank', 'aiModels', 'patterns');
+    return compact('config', 'store', 'audit', 'throttle', 'auth', 'limiter', 'genres', 'categories', 'references', 'emojiBank', 'aiModels', 'patterns', 'legendValidator', 'gameValidator', 'games', 'levels');
 }
