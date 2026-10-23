@@ -92,6 +92,12 @@ abstract class TestCase
         return $dir;
     }
 
+    /** Регистрирует уже созданный каталог для автоочистки в tearDown. */
+    protected function trackTmpDir(string $dir): void
+    {
+        $this->tmpDirs[] = $dir;
+    }
+
     public function tearDown(): void
     {
         foreach ($this->tmpDirs as $dir) {

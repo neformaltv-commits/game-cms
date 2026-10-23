@@ -26,30 +26,32 @@ final class SettingsServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        require_once __DIR__ . '/../Support/Maker.php';
-        $this->dir = \Tests\Support\Maker::tmpDir('settings');
+        $this->dir = $this->tmpDir('settings');
         $this->store = new FileStore($this->dir);
         $this->audit = new Logger($this->store, 'audit.log', 14);
         $cfgDir = dirname(__DIR__, 2) . '/config';
         $this->genres = new GenreService($this->store, $this->audit, $cfgDir);
+        $this->genres->seed(); // фикстуры жанров из config/genre-defaults (идемпотентно)
         $cats = new CategoryService($this->store, $this->audit);
-        $ai = new LibraryService($this->store, $this->audit, LibraryService::KIND_AI);
-        $pat = new LibraryService($this->store, $this->audit, LibraryService::KIND_PATTERN);
+        $ai = new LibraryService($this->store, $this->audit, LibraryService::KIND_AI, dirname(__DIR__, 2));
+        $pat = new LibraryService($this->store, $this->audit, LibraryService::KIND_PATTERN, dirname(__DIR__, 2));
+        $ai->seed();
+        $pat->seed();
         $lv = new LegendValidator($ai, $pat);
         $gv = new GameValidator($this->genres, $cats, $lv, $this->store, $this->dir . '/media');
         $this->games = new GameService($this->store, $this->audit, $this->genres, $gv, $this->dir . '/media');
         $this->svc = new SettingsService($this->store, $this->audit, $this->genres, $this->games);
     }
 
-    protected function tearDown(): void
+    public function tearDown(): void
     {
-        \Tests\Support\Maker::rrmdir($this->dir);
+        // tmpDir() регистрирует каталог; базовый TestCase удалит его сам
     }
 
     private function makeGame(string $slug): array
     {
         $res = $this->games->create([
-            'title' => 'Тест ' . $slug, 'description' => str_repeat('д', 30), 'genre_id' => 'lode-runner',
+            'title' => 'Тест ' . $slug, 'description' => str_repeat('д', 30), 'genre_id' => 'genre-loderunner',
             'category_ids' => [], 'status' => 'draft', 'slug' => $slug,
         ]);
         assert($res['ok']);
@@ -163,7 +165,7 @@ final class SettingsServiceTest extends TestCase
         $this->svc->saveOverrides($g2['id'], ['speed_scale' => '1.8']);
         $this->svc->saveSounds($g2['id'], ['sounds_json' => json_encode([])]);
         // другой движок — ошибка
-        $other = $this->games->create(['title' => 'Рейд', 'description' => str_repeat('р', 30), 'genre_id' => 'river-raid', 'category_ids' => [], 'status' => 'draft', 'slug' => 'cp-other-engine']);
+        $other = $this->games->create(['title' => 'Рейд', 'description' => str_repeat('р', 30), 'genre_id' => 'genre-riverraid', 'category_ids' => [], 'status' => 'draft', 'slug' => 'cp-other-engine']);
         assert($other['ok']);
         $errs = $this->svc->copyFrom($g1['id'], $other['game']['id'], ['controls']);
         $this->assertSame(['Источник должен быть того же движка.'], $errs);

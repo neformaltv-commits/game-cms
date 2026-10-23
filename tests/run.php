@@ -44,7 +44,9 @@ foreach (array_diff($after, $before) as $class) {
         $instance = $ref->newInstance();
         try {
             if ($ref->hasMethod('setUp')) {
-                $instance->setUp();
+                $su = $ref->getMethod('setUp');
+                $su->setAccessible(true);
+                $su->invoke($instance);
             }
             $instance->{$m->getName()}();
             $totalPass++;
