@@ -113,18 +113,32 @@ final class EmojiBankService
             throw new UploadException('Неподдерживаемый формат хранения');
         }
 
-        $slot = $this->allocateSlot();
+        // Атомарная резервация слота под блокировкой счётчика (ТЗ §3.6):
+        // параллельные загрузки не могут получить один и тот же codepoint.
+        // Мутатор меняет сам $c (call-by-reference в mutate), а возвращает слот.
+        $slot = $this->store->mutate(self::COUNTER_FILE, static function (mixed &$c) use ($format): array {
+            $next = (int)(is_array($c) ? ($c['next'] ?? 0) : 0);
+            if ($next >= self::PUA_LIMIT) {
+                throw new UploadException('Не осталось свободных PUA-кодпоинтов. Лимит — 6400.');
+            }
+            $idNum = $next + 1;
+            $num = str_pad((string)$idNum, 3, '0', STR_PAD_LEFT);
+            $c = ['next' => $idNum];
+            return [
+                'id' => 'e' . $num,
+                'codepoint' => sprintf('U+%04X', self::PUA_START + ($idNum - 1)),
+                'file' => self::MEDIA_DIR . '/' . $num . '.' . $format,
+            ];
+        });
+        /** @var array{id: string, codepoint: string, file: string} $slot */
         $id = $slot['id'];
-        $relInMedia = self::MEDIA_DIR . '/' . $id . '.' . $format;
+        $relInMedia = $slot['file'];
         $absPath = $this->mediaRoot . '/' . $relInMedia;
 
         $dir = dirname($absPath);
         if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+            $this->rollbackCounter((int)substr($id, 1));
             throw new UploadException('Не удалось создать каталог медиа');
-        }
-        // Транзакция: файл -> JSON -> счётчик (ТЗ §3.6).
-        if (file_put_contents($absPath, $bytes) === false) {
-            throw new UploadException('Не удалось записать файл эмодзи');
         }
 
         $now = gmdate('Y-m-d\TH:i:s\Z');
@@ -145,37 +159,6 @@ final class EmojiBankService
             'updated_at' => $now,
         ];
 
-        // Слот и счётчик резервируются атомарно ДО записи файла: иначе параллельные
-        // загрузки получили бы один и тот же codepoint (снимок allocateSlot устарел бы).
-        $reserved = false;
-        try {
-            $this->store->mutate(self::COUNTER_FILE, function (mixed $c) use (&$slot, &$id, &$relInMedia, &$absPath, &$reserved): array {
-                $next = (int)(is_array($c) ? ($c['next'] ?? 0) : 0);
-                if ($next >= self::PUA_LIMIT) {
-                    throw new UploadException('Не осталось свободных PUA-кодпоинтов. Лимит — 6400.');
-                }
-                $idNum = $next + 1;
-                $slot = [
-                    'id' => 'e' . str_pad((string)$idNum, 3, '0', STR_PAD_LEFT),
-                    'codepoint' => sprintf('U+%04X', self::PUA_START + ($idNum - 1)),
-                ];
-                $id = $slot['id'];
-                $relInMedia = self::MEDIA_DIR . '/' . $id . '.' . $format;
-                $absPath = $this->mediaRoot . '/' . $relInMedia;
-                $reserved = true;
-                return ['next' => $idNum];
-            });
-        } catch (\Throwable $e) {
-            $this->deleteMediaFile($absPath);
-            throw $e;
-        }
-
-        $dir = dirname($absPath);
-        if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
-            $this->rollbackCounter((int)substr($id, 1));
-            $this->deleteMediaFile($absPath);
-            throw new UploadException('Не удалось создать каталог медиа');
-        }
         // Транзакция: файл -> JSON (ТЗ §3.6); ошибка — откат файла и счётчика.
         $fileWritten = false;
         try {
@@ -183,9 +166,6 @@ final class EmojiBankService
                 throw new UploadException('Не удалось записать файл эмодзи');
             }
             $fileWritten = true;
-            $record['id'] = $id;
-            $record['codepoint'] = $slot['codepoint'];
-            $record['image_path'] = 'media/' . $relInMedia;
             $this->store->mutate(self::BANK_FILE, static function (mixed $rows) use ($record): array {
                 $rows = is_array($rows) ? $rows : [];
                 $rows[] = $record;
@@ -909,9 +889,30 @@ final class EmojiBankService
     private function bumpCounterTo(int $idNum): void
     {
         // Счётчик монотонный: next = номер последнего назначенного id.
-        $this->store->mutate(self::COUNTER_FILE, static function (mixed $c) use ($idNum): array {
+        $this->store->mutate(self::COUNTER_FILE, static function (mixed &$c) use ($idNum): bool {
             $next = (int)(is_array($c) ? ($c['next'] ?? 0) : 0);
-            return ['next' => max($next, $idNum)];
+            if ($idNum <= $next) {
+                return false; // уже не меньше — не пишем
+            }
+            $c = ['next' => $idNum];
+            return true;
+        });
+    }
+
+    /**
+     * Откат резервации счётчика при сбое записи файла/JSON (ТЗ §3.6).
+     * Уменьшает next только если он ровно равен откатываемому номеру —
+     * параллельная успешная загрузка не должна быть перезаписана.
+     */
+    private function rollbackCounter(int $idNum): void
+    {
+        $this->store->mutate(self::COUNTER_FILE, static function (mixed &$c) use ($idNum): bool {
+            $next = (int)(is_array($c) ? ($c['next'] ?? 0) : 0);
+            if ($next !== $idNum) {
+                return false; // не сохранять: счётчик ушёл дальше
+            }
+            $c = ['next' => $idNum - 1];
+            return true;
         });
     }
 }
