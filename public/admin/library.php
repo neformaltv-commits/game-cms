@@ -17,6 +17,14 @@ use App\Validation\LibParamValidator;
 $user = require_admin($app);
 csrf_guard();
 
+/** flash() — короткое имя для существующего flash_set(). */
+if (!function_exists('flash')) {
+    function flash(string $type, string $message): void
+    {
+        flash_set($type, $message);
+    }
+}
+
 $kind = (($_GET['kind'] ?? $_POST['kind'] ?? 'ai') === 'pattern')
     ? LibraryService::KIND_PATTERN
     : LibraryService::KIND_AI;
