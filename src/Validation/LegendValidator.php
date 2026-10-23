@@ -33,9 +33,10 @@ final class LegendValidator
     {
         $errors = [];
 
-        // Ключи — один графемный кластер-эмодзи (защита от HTML/XSS, ТЗ §9)
+        // Ключи — один графемный кластер-эмодзи (защита от HTML/XSS, ТЗ §9).
+        // «.» — стандартное обозначение пустой клетки (ТЗ блок 8), допустимо как ключ легенды.
         foreach ($effectiveLegend as $emoji => $el) {
-            if (!is_string($emoji) || !EmojiUtil::isSingleEmoji($emoji)) {
+            if (!is_string($emoji) || ($emoji !== '.' && !EmojiUtil::isSingleEmoji($emoji))) {
                 $errors[] = sprintf('Элемент «%s»: ключ должен быть одним emoji-кластером.', is_string($emoji) ? $emoji : gettype($emoji));
             }
             if (!is_array($el)) {
