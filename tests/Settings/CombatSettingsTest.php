@@ -61,10 +61,12 @@ final class CombatSettingsTest extends TestCase
         $legend = (array)$game['legend'];
         $legend['➡️'] = ['role' => 'projectile', 'name' => 'Пуля', 'damage' => 1, 'speed_tiles_per_s' => 8, 'range_tiles' => 10];
         $legend['🤖'] = ['role' => 'mob', 'name' => 'Робот', 'hp' => 2, 'damage_on_touch' => 1,
-            'ai_model' => 'idle', 'movement_pattern' => 'linear', 'score_value' => 50];
+            'ai_model' => 'stationary', 'movement_pattern' => 'linear', 'score_value' => 50];
         $game['legend'] = $legend;
         $errs = $this->games->save($game, false);
-        assert($errs === [], implode('; ', $errs));
+        if ($errs !== []) {
+            throw new \RuntimeException('save legend: ' . implode('; ', $errs));
+        }
         return $this->games->find((string)$game['id']);
     }
 
@@ -95,6 +97,18 @@ final class CombatSettingsTest extends TestCase
     public function testMeleeRequiresFireKey(): void
     {
         $game = $this->makeCombatGame('atk-nofire');
+        // genre-platformer (horizontal-scroll) имеет fire по умолчанию — снимаем его,
+        // чтобы проверить требование «melee ⇒ назначена клавиша fire» (§6.1).
+        // saveControls не позволит сохранить пустой обязательный fire, поэтому
+        // типовое решение — прямая запись в хранилище (как в resetControls).
+        if (($game['controls']['fire'] ?? []) !== []) {
+            $this->store->mutate('games/' . $game['id'] . '.json', static function (array &$g): bool {
+                unset($g['controls']['fire']);
+                return true;
+            });
+            $game = $this->games->find((string)$game['id']);
+            assert(($game['controls']['fire'] ?? []) === [], 'fire не снялся из controls');
+        }
         $res = $this->svc->savePlayerAttacks($game['id'], [
             'melee' => ['enabled' => true, 'damage' => 1, 'shape' => 'single', 'cooldown_ms' => 300, 'hits' => ['mob']],
         ]);
